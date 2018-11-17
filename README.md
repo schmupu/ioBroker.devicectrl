@@ -1,6 +1,6 @@
 ![Logo](admin/ruleset.png)
 
-# ioBroker ruleset VoIP Adapter
+# ioBroker ruleset Adapter
 
 
 [![Travis CI Build Status](https://travis-ci.org/schmupu/ioBroker.ruleset.svg?branch=master)](https://travis-ci.org/schmupu/ioBroker.ruleset)

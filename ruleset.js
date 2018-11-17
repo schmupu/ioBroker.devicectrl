@@ -2,26 +2,25 @@
 
 var utils = require(__dirname + '/lib/utils'); // Get common adapter utils
 var dp = require(__dirname + '/lib/datapoints');
+var rulesset  = require(__dirname + '/lib/rules');
 var net = require('net');
 var adapter = new utils.Adapter('ruleset');
+
 
 // *****************************************************************************************************
 // is called when adapter shuts down - callback has to be called under any circumstances!
 // *****************************************************************************************************
 adapter.on('unload', (callback) => {
-
   try {
     adapter.log.info('Closing ruleset Adapter');
 
     if (server) {
       server.close();
     }
-
     callback();
   } catch (e) {
     callback();
   }
-
 });
 
 
@@ -49,6 +48,6 @@ adapter.on('ready', () => {
 function main() {
 
   adapter.log.info("Starting Adapter");
- 
+  let rules = new rulesset();
 
 }
