@@ -15,7 +15,8 @@
   "homepage": "https://github.com/schmupu/ioBroker.ruleset",
   "license": "MIT",
   "keywords": [
-    "ruleset"
+    "ruleset",
+    "logic"
   ],
   "repository": {
     "type": "git",

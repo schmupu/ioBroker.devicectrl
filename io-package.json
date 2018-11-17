@@ -1,6 +1,6 @@
 {
   "common": {
-    "name": "ruleset",
+    "name": "Ruleset",
     "version": "0.1.0",
     "news": {
       "0.1.0": {
@@ -8,13 +8,12 @@
         "de": "Erste Version"
       }
     },
-    "title": "Ruleset",
     "titleLang": {
-      "en": "ruleset",
+      "en": "Ruleset",
       "de": "Ruleset"
     },
     "desc": {
-      "en": "ruleset",
+      "en": "Ruleset",
       "de": "Ruleset"
     },
     "license": "MIT",
@@ -30,13 +29,16 @@
     "materialize": true,
     "enabled": true,
     "extIcon": "https://raw.githubusercontent.com/schmupu/ioBroker.ruleset/master/admin/ruleset.png",
-    "keywords": ["ruleset"],
+    "keywords": [
+      "ruleset"
+    ],
     "readme": "https://github.com/schmupu/ioBroker.ruleset/blob/master/README.md",
     "loglevel": "info",
-    "type": "communication",
+    "type": "logic",
     "restartAdapters": []
   },
   "native": {
+    "pollInterval": "15"
   },
   "objects": [],
   "instanceObjects": []
