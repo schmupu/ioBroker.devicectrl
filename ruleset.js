@@ -72,4 +72,8 @@ function main() {
 
   adapter.log.info("Starting Adapter");
 
+  setInterval(() => {
+    rules.executeRules((values) => { })
+    }, adapter.config.pollInterval * 1000);
+
 }
