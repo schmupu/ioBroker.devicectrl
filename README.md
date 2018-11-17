@@ -1,6 +1,31 @@
+![Logo](admin/ruleset.png)
+
+# ioBroker ruleset VoIP Adapter
+
+
+[![Travis CI Build Status](https://travis-ci.org/schmupu/ioBroker.ruleset.svg?branch=master)](https://travis-ci.org/schmupu/ioBroker.ruleset)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/schmupu/ioBroker.ruleset?branch=master&svg=true)](https://ci.appveyor.com/project/schmupu/ioBroker-ruleset/)
+[![NPM version](http://img.shields.io/npm/v/iobroker.ruleset.svg)](https://www.npmjs.com/package/iobroker.ruleset)
+[![Downloads](https://img.shields.io/npm/dm/iobroker.ruleset.svg)](https://www.npmjs.com/package/iobroker.ruleset)
+
+[![NPM](https://nodei.co/npm/iobroker.ruleset.png?downloads=true)](https://nodei.co/npm/iobroker.ruleset/)
+
+...
+
+## Install & Configuration
+
+...
+
+## Changelog
+
+### 0.1.0 (17.11.2018)
+* (Stübi) First Version
+
+
+## License
 The MIT License (MIT)
 
-Copyright (c) 2018 Thorsten Stueben <thorsten@stueben.de> / <https://github.com/schmupu>
+Copyright (c) 2018 Thorsten <thorsten@stueben.de> / <https://github.com/schmupu>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

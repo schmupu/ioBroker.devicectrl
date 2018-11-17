@@ -1,0 +1,43 @@
+{
+  "common": {
+    "name": "ruleset",
+    "version": "0.1.0",
+    "news": {
+      "0.1.0": {
+        "en": "First version",
+        "de": "Erste Version"
+      }
+    },
+    "title": "Ruleset",
+    "titleLang": {
+      "en": "ruleset",
+      "de": "Ruleset"
+    },
+    "desc": {
+      "en": "ruleset",
+      "de": "Ruleset"
+    },
+    "license": "MIT",
+    "authors": [
+      "Thorsten Stueben <thorsten@stueben.de>"
+    ],
+    "platform": "Javascript/Node.js",
+    "mode": "daemon",
+    "messagebox": true,
+    "stopBeforeUpdate": true,
+    "subscribe": "messagebox",
+    "icon": "ruleset.png",
+    "materialize": true,
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/schmupu/ioBroker.ruleset/master/admin/ruleset.png",
+    "keywords": ["ruleset"],
+    "readme": "https://github.com/schmupu/ioBroker.ruleset/blob/master/README.md",
+    "loglevel": "info",
+    "type": "communication",
+    "restartAdapters": []
+  },
+  "native": {
+  },
+  "objects": [],
+  "instanceObjects": []
+}

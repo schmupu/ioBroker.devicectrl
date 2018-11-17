@@ -1,0 +1,39 @@
+{
+  "name": "iobroker.ruleset",
+  "version": "0.1.0",
+  "description": "Ruleset",
+  "author": {
+    "name": "Thorsten Stueben",
+    "email": "thorsten@stueben.de"
+  },
+  "contributors": [
+    {
+      "name": "Thorsten Stueben",
+      "email": "thorsten@stueben.de"
+    }
+  ],
+  "homepage": "https://github.com/schmupu/ioBroker.ruleset",
+  "license": "MIT",
+  "keywords": [
+    "ruleset"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/schmupu/ioBroker.ruleset"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "mocha": "^4.1.0",
+    "chai": "^4.1.2"
+  },
+  "main": "ruleset.js",
+  "scripts": {
+    "test": "node node_modules/mocha/bin/mocha --exit"
+  },
+  "bugs": {
+    "url": "https://github.com/schmupu/ioBroker.ruleset/issues"
+  },
+  "readmeFilename": "README.md"
+}
