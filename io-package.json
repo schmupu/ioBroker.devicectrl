@@ -39,6 +39,8 @@
   },
   "native": {
     "pollInterval": "15",
+    "simulation": false,
+    "holiday": "HH",
     "ruleset": []
   },
   "objects": [],

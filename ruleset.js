@@ -6,7 +6,7 @@ var rulesset = require(__dirname + '/lib/rules');
 var net = require('net');
 var adapter = new utils.Adapter('ruleset');
 var vm = require('vm');
-var rules = new rulesset(adapter);
+var rules = null; 
 var request = require("request");
 var sched = require("node-schedule");
 
@@ -83,10 +83,12 @@ function getFeiertag(state, callback, year) {
       if (body) {
         let result = JSON.parse(body);
         callback && callback(result);
+      } else {
+        callback && callback();
       }
     });
   }
-  callback && callback();
+
 }
 
 // *****************************************************************************************************
@@ -120,12 +122,15 @@ function loadRulesSet(callback) {
 // Main
 // *****************************************************************************************************
 function main() {
+  rules = new rulesset(adapter);
+  let cal        = adapter.config.holiday || 'HH';
+  let simulation = adapter.config.simulation || false; 
 
   adapter.log.info("Starting Adapter");
 
   //Get every Jear new Hollidays
   sched.scheduleJob('1 0 * * *', function () {
-    getFeiertag('HH', (holidays) => {
+    getFeiertag(cal , (holidays) => {
       adapter.log.info("Got new holidays!");
       rules.setFeiertage(holidays);
     });
@@ -133,8 +138,8 @@ function main() {
 
 
   // on every Start get Holidays
-  getFeiertag('HH', (holidays) => {
-    adapter.log.info("Got new holidays2");
+  getFeiertag(cal , (holidays) => {
+    adapter.log.info("Got new holidays");
     rules.setFeiertage(holidays);
   });
 

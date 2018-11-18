@@ -23,5 +23,27 @@ systemDictionary = {
     "it": "Impostazioni principali",
     "es": "Ajustes principales",
     "pl": "Ustawienia główne"
+  },
+  "simulation": {
+    "en": "simulation",
+    "de": "Simulation",
+    "ru": "моделирование",
+    "pt": "simulação",
+    "nl": "simulatie",
+    "fr": "simulation",
+    "it": "simulazione",
+    "es": "simulación",
+    "pl": "symulacja"
+  },
+  "holiday": {
+    "en": "holiday calendar",
+    "de": "Feiertagskalender",
+    "ru": "праздничный календарь",
+    "pt": "calendário de férias",
+    "nl": "vakantie kalender",
+    "fr": "calendrier de vacances",
+    "it": "calendario delle festività",
+    "es": "calendario de vacaciones",
+    "pl": "kalendarz wakacyjny"
   }
 };
