@@ -172,7 +172,7 @@ function saveRulesSet(ruleset) {
     adapter.getForeignObject(id, function (err, obj) {
       obj.native.ruleset = ruleset;
       adapter.setForeignObject(id, obj, function (err) {
-        adapter.log.info("Saving Ruleset successfull");ƒ
+        adapter.log.info("Saving Ruleset successfull");
       });
     });
   }
