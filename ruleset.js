@@ -6,7 +6,7 @@ var rulesset = require(__dirname + '/lib/rules');
 var net = require('net');
 var adapter = new utils.Adapter('ruleset');
 var vm = require('vm');
-var rules = null; 
+var rules = null;
 var request = require("request");
 var sched = require("node-schedule");
 
@@ -51,12 +51,15 @@ adapter.on('message', (msg) => {
       break;
   }
 
-
   let r = rules.getRules();
   saveRulesSet(r);
 
   rules.executeRules((values) => {
-    // callback && callback(values);
+    if (values) {
+      adapter.log.debug(JSON.stringify(values));
+    } else {
+      adapter.log.error("Error by executing rules");
+    }
   });
 
 });
@@ -91,56 +94,100 @@ function getFeiertag(state, callback, year) {
 
 }
 
-// *****************************************************************************************************
-// Relgelwerg speichern
-// *****************************************************************************************************
-function saveRulesSet(ruleset) {
-  let id = "system.adapter." + adapter.namespace;
-  adapter.getForeignObject(id, function (err, obj) {
-    obj.native.ruleset = ruleset;
-    adapter.setForeignObject(id, obj, function (err) {
 
+// *****************************************************************************************************
+// Save Holidays
+// *****************************************************************************************************
+function saveHolidays(holiday) {
+  if (holiday) {
+    let id = "config.holiday";
+    holiday = JSON.stringify(holiday);
+    adapter.log.info("Saving Holidays");
+    adapter.setState(id, holiday, true, function (err) {
+      if (!err) {
+        adapter.log.info("Saving Holidays successfull");
+      }
     });
-  });
+  }
 }
 
+
 // *****************************************************************************************************
 // Relgelwerg speichern
 // *****************************************************************************************************
-function loadRulesSet(callback) {
-  let id = "system.adapter." + adapter.namespace;
-  adapter.getForeignObject(id, function (err, obj) {
-    if (!err) {
-      callback && callback(obj.native.ruleset || []);
+function loadHoliday(callback) {
+  let id = "config.holiday";
+  adapter.log.info("Loading Holidays");
+  adapter.getState(id, function (err, state) {
+    if (!err && state && state.val) {
+      state = JSON.parse(state.val);
+      callback && callback(state || []);
     } else {
       callback && callback([]);
     }
   });
 }
 
+
+// *****************************************************************************************************
+// Relgelwerg speichern
+// *****************************************************************************************************
+function saveRulesSet(ruleset) {
+  if (ruleset) {
+    let id = "config.ruleset";
+    ruleset = JSON.stringify(ruleset);
+    adapter.log.info("Saving Ruleset");
+    adapter.setState(id, ruleset, true, function (err) {
+      if (!err) {
+        adapter.log.info("Saving Ruleset successfull");
+      }
+    });
+  }
+}
+
+
+// *****************************************************************************************************
+// Relgelwerg speichern
+// *****************************************************************************************************
+function loadRulesSet(callback) {
+  let id = "config.ruleset";
+  adapter.log.info("Loading Ruleset");
+  adapter.getState(id, function (err, state) {
+    if (!err && state && state.val) {
+      state = JSON.parse(state.val);
+      callback && callback(state || []);
+    } else {
+      callback && callback([]);
+    }
+  });
+}
+
+
 // *****************************************************************************************************
 // Main
 // *****************************************************************************************************
 function main() {
   rules = new rulesset(adapter);
-  let cal        = adapter.config.holiday || 'HH';
-  let simulation = adapter.config.simulation || false; 
+  let cal = adapter.config.holiday || 'HH';
+  let simulation = adapter.config.simulation || false;
 
   adapter.log.info("Starting Adapter");
 
   //Get every Jear new Hollidays
   sched.scheduleJob('1 0 * * *', function () {
-    getFeiertag(cal , (holidays) => {
+    getFeiertag(cal, (holidays) => {
       adapter.log.info("Got new holidays!");
       rules.setFeiertage(holidays);
+      saveHolidays(holidays);
     });
   });
 
 
   // on every Start get Holidays
-  getFeiertag(cal , (holidays) => {
+  getFeiertag(cal, (holidays) => {
     adapter.log.info("Got new holidays");
     rules.setFeiertage(holidays);
+    saveHolidays(holidays);
   });
 
 

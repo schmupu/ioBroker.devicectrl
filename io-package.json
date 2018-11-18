@@ -44,5 +44,30 @@
     "ruleset": []
   },
   "objects": [],
-  "instanceObjects": []
+  "instanceObjects": [
+    {
+      "_id": "config.ruleset",
+      "type": "state",
+      "common": {
+        "name": "Ruleset",
+        "desc": "Ruleset",
+        "type": "string",
+        "read": true,
+        "write": false
+      },
+      "native": {}
+    },
+    {
+      "_id": "config.holiday",
+      "type": "state",
+      "common": {
+        "name": "Holidays",
+        "desc": "Holidays",
+        "type": "string",
+        "read": true,
+        "write": false
+      },
+      "native": {}
+    }
+  ]
 }
