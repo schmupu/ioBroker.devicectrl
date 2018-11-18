@@ -62,6 +62,8 @@ adapter.on('message', (msg) => {
     }
   });
 
+  adapter.sendTo(msg.from, msg.command, "command", msg.callback);
+
 });
 
 
