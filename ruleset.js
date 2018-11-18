@@ -18,7 +18,7 @@ adapter.on('unload', (callback) => {
     adapter.log.info('Closing Adapter');
     callback();
   } catch (e) {
-    adapter.log.error('Error');
+    // adapter.log.error('Error');
     callback();
   }
 });
@@ -132,7 +132,7 @@ function loadHoliday(callback) {
 // *****************************************************************************************************
 // Relgelwerg speichern
 // *****************************************************************************************************
-function saveRulesSet(ruleset) {
+function saveRulesSetOld(ruleset) {
   if (ruleset) {
     let id = "config.ruleset";
     ruleset = JSON.stringify(ruleset);
@@ -149,13 +149,41 @@ function saveRulesSet(ruleset) {
 // *****************************************************************************************************
 // Relgelwerg speichern
 // *****************************************************************************************************
-function loadRulesSet(callback) {
+function loadRulesSetOld(callback) {
   let id = "config.ruleset";
   adapter.log.info("Loading Ruleset");
   adapter.getState(id, function (err, state) {
     if (!err && state && state.val) {
       state = JSON.parse(state.val);
       callback && callback(state || []);
+    } else {
+      callback && callback([]);
+    }
+  });
+}
+
+// *****************************************************************************************************
+// Relgelwerg speichern
+// *****************************************************************************************************
+function saveRulesSet(ruleset) {
+  if (ruleset) {
+    let id = "system.adapter." + adapter.namespace;
+    adapter.getForeignObject(id, function (err, obj) {
+      obj.native.ruleset = ruleset;
+      adapter.setForeignObject(id, obj, function (err) {
+      });
+    });
+  }
+}
+
+// *****************************************************************************************************
+// Relgelwerg speichern
+// *****************************************************************************************************
+function loadRulesSet(callback) {
+  let id = "system.adapter." + adapter.namespace;
+  adapter.getForeignObject(id, function (err, obj) {
+    if (!err) {
+      callback && callback(obj.native.ruleset || []);
     } else {
       callback && callback([]);
     }
@@ -177,8 +205,8 @@ function main() {
   sched.scheduleJob('1 0 * * *', function () {
     getFeiertag(cal, (holidays) => {
       adapter.log.info("Got new holidays!");
-      rules.setFeiertage(holidays);
-      saveHolidays(holidays);
+      //rules.setFeiertage(holidays);
+      //saveHolidays(holidays);
     });
   });
 
@@ -186,8 +214,8 @@ function main() {
   // on every Start get Holidays
   getFeiertag(cal, (holidays) => {
     adapter.log.info("Got new holidays");
-    rules.setFeiertage(holidays);
-    saveHolidays(holidays);
+    //rules.setFeiertage(holidays);
+    //saveHolidays(holidays);
   });
 
 
