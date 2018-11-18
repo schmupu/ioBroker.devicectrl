@@ -14,12 +14,9 @@ var rules = new rulesset(adapter);
 adapter.on('unload', (callback) => {
   try {
     adapter.log.info('Closing ruleset Adapter');
-
-    if (server) {
-      server.close();
-    }
     callback();
   } catch (e) {
+    e.stack && adapter.log.error("Error: " + e.stack);
     callback();
   }
 });
@@ -44,6 +41,9 @@ adapter.on('message', (msg) => {
       break;
     case 'modify':
       rules.modifyRule(parameter);
+      break;
+    case 'holiday':
+      rules.setFeiertage(parameter);
       break;
     default:
       break;
@@ -107,7 +107,7 @@ function main() {
     rules.modifyRules(r);
     rules.executeRules((values) => { });
   });
-  
+
 
   setInterval(() => {
     rules.executeRules((values) => { })
