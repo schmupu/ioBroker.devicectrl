@@ -18,7 +18,7 @@ adapter.on('unload', (callback) => {
     adapter.log.info('Closing Adapter');
     callback();
   } catch (e) {
-    e.stack && adapter.log.error("Error: " + e.stack);
+    adapter.log.error("Error: " + e);
     callback();
   }
 });
