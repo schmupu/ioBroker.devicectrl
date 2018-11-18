@@ -7,13 +7,15 @@ var net = require('net');
 var adapter = new utils.Adapter('ruleset');
 var vm = require('vm');
 var rules = new rulesset(adapter);
+var request = require("request");
+var sched = require("node-schedule");
 
 // *****************************************************************************************************
 // is called when adapter shuts down - callback has to be called under any circumstances!
 // *****************************************************************************************************
 adapter.on('unload', (callback) => {
   try {
-    adapter.log.info('Closing ruleset Adapter');
+    adapter.log.info('Closing Adapter');
     callback();
   } catch (e) {
     e.stack && adapter.log.error("Error: " + e.stack);
@@ -68,6 +70,24 @@ adapter.on('ready', () => {
   main();
 });
 
+// *****************************************************************************************************
+// Read holidays
+// *****************************************************************************************************
+
+function getFeiertag(state, callback, year) {
+
+  if (state) {
+    if (!year) year = (new Date()).getFullYear();
+    let url = "https://ipty.de/feiertag/api.php?do=getFeiertage&loc=" + state + "&jahr=" + year + "&outformat=Y-m-d";
+    request({ url: url }, function (error, response, body) {
+      if (body) {
+        let result = JSON.parse(body);
+        callback && callback(result);
+      }
+    });
+  }
+  callback && callback();
+}
 
 // *****************************************************************************************************
 // Relgelwerg speichern
@@ -103,14 +123,42 @@ function main() {
 
   adapter.log.info("Starting Adapter");
 
+  //Get every Jear new Hollidays
+  sched.scheduleJob('1 0 * * *', function () {
+    getFeiertag('HH', (holidays) => {
+      adapter.log.info("Got new holidays!");
+      rules.setFeiertage(holidays);
+    });
+  });
+
+
+  // on every Start get Holidays
+  getFeiertag('HH', (holidays) => {
+    adapter.log.info("Got new holidays2");
+    rules.setFeiertage(holidays);
+  });
+
+
   loadRulesSet((r) => {
     rules.modifyRules(r);
-    rules.executeRules((values) => { });
+    rules.executeRules((values) => {
+      if (values) {
+        adapter.log.debug(JSON.stringify(values));
+      } else {
+        adapter.log.error("Error by executing rules");
+      }
+    });
   });
 
 
   setInterval(() => {
-    rules.executeRules((values) => { })
+    rules.executeRules((values) => {
+      if (values) {
+        adapter.log.debug(JSON.stringify(values));
+      } else {
+        adapter.log.error("Error by executing rules");
+      }
+    })
   }, adapter.config.pollInterval * 1000);
 
 }
