@@ -49,6 +49,10 @@ adapter.on('message', (msg) => {
       break;
   }
 
+
+  let r = rules.getRules();
+  saveRulesSet(r);
+
   rules.executeRules((values) => {
     // callback && callback(values);
   });
@@ -66,14 +70,47 @@ adapter.on('ready', () => {
 
 
 // *****************************************************************************************************
-// Main function
+// Relgelwerg speichern
+// *****************************************************************************************************
+function saveRulesSet(ruleset) {
+  let id = "system.adapter." + adapter.namespace;
+  adapter.getForeignObject(id, function (err, obj) {
+    obj.native.ruleset = ruleset;
+    adapter.setForeignObject(id, obj, function (err) {
+
+    });
+  });
+}
+
+// *****************************************************************************************************
+// Relgelwerg speichern
+// *****************************************************************************************************
+function loadRulesSet(callback) {
+  let id = "system.adapter." + adapter.namespace;
+  adapter.getForeignObject(id, function (err, obj) {
+    if (!err) {
+      callback && callback(obj.native.ruleset || []);
+    } else {
+      callback && callback([]);
+    }
+  });
+}
+
+// *****************************************************************************************************
+// Main
 // *****************************************************************************************************
 function main() {
 
   adapter.log.info("Starting Adapter");
 
+  loadRulesSet((r) => {
+    rules.modifyRules(r);
+    rules.executeRules((values) => { });
+  });
+  
+
   setInterval(() => {
     rules.executeRules((values) => { })
-    }, adapter.config.pollInterval * 1000);
+  }, adapter.config.pollInterval * 1000);
 
 }
