@@ -168,9 +168,11 @@ function loadRulesSetOld(callback) {
 function saveRulesSet(ruleset) {
   if (ruleset) {
     let id = "system.adapter." + adapter.namespace;
+    adapter.log.info("Saving Ruleset");
     adapter.getForeignObject(id, function (err, obj) {
       obj.native.ruleset = ruleset;
       adapter.setForeignObject(id, obj, function (err) {
+        adapter.log.info("Saving Ruleset successfull");ƒ
       });
     });
   }
@@ -181,8 +183,10 @@ function saveRulesSet(ruleset) {
 // *****************************************************************************************************
 function loadRulesSet(callback) {
   let id = "system.adapter." + adapter.namespace;
+  adapter.log.info("Loading Ruleset");
   adapter.getForeignObject(id, function (err, obj) {
     if (!err) {
+      adapter.log.info("Loading Ruleset successfull");
       callback && callback(obj.native.ruleset || []);
     } else {
       callback && callback([]);
