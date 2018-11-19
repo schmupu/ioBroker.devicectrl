@@ -54,11 +54,11 @@ adapter.on('message', (msg) => {
   let r = rules.getRules();
   saveRulesSet(r);
 
-  rules.executeRules((values) => {
-    if (values) {
+  rules.executeRules((error, values) => {
+    if (!error && values) {
       adapter.log.debug(JSON.stringify(values));
     } else {
-      adapter.log.error("Error by executing rules");
+      adapter.log.error(error);
     }
   });
 
@@ -227,22 +227,22 @@ function main() {
 
   loadRulesSet((r) => {
     rules.modifyRules(r);
-    rules.executeRules((values) => {
-      if (values) {
+    rules.executeRules((error, values) => {
+      if (!error && values) {
         adapter.log.debug(JSON.stringify(values));
       } else {
-        adapter.log.error("Error by executing rules");
+        adapter.log.error(error);
       }
     });
   });
 
 
   setInterval(() => {
-    rules.executeRules((values) => {
-      if (values) {
+    rules.executeRules((error, values) => {
+      if (!error && values) {
         adapter.log.debug(JSON.stringify(values));
       } else {
-        adapter.log.error("Error by executing rules");
+        adapter.log.error(error);
       }
     })
   }, adapter.config.pollInterval * 1000);
