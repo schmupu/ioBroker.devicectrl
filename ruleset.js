@@ -45,7 +45,7 @@ adapter.on('message', (msg) => {
       rules.modifyRule(parameter);
       break;
     case 'holiday':
-      rules.setFeiertage(parameter);
+      rules.setHolidays(parameter);
       break;
     default:
       break;
@@ -94,6 +94,19 @@ function getFeiertag(state, callback, year) {
     });
   }
 
+}
+
+// *****************************************************************************************************
+// Get coordinates
+// *****************************************************************************************************
+function getCoordnates(callback) {
+  adapter.getForeignObject('system.config', (error, states) => {
+    if (states.common.latitude && states.common.longitude) {
+      callback && callback({ latitude: states.common.latitude, longitude: states.common.longitude });
+    } else {
+      callback && callback();
+    }
+  });
 }
 
 
@@ -210,41 +223,58 @@ function main() {
   //Get every Jear new Hollidays
   sched.scheduleJob('1 0 * * *', function () {
     getFeiertag(cal, (holidays) => {
-      adapter.log.info("Got new holidays!");
-      //rules.setFeiertage(holidays);
-      //saveHolidays(holidays);
+      if (holidays) {
+        adapter.log.info("Got new holidays");
+        rules.setHolidays(holidays);
+      }
+    });
+    getCoordnates((coord) => {
+      if (coord) {
+        rules.setCoordinates(coord.latitude, coord.longitude);
+        adapter.log.info("Got coordinates!");
+      }
     });
   });
+
 
 
   // on every Start get Holidays
   getFeiertag(cal, (holidays) => {
-    adapter.log.info("Got new holidays");
-    //rules.setFeiertage(holidays);
-    //saveHolidays(holidays);
-  });
+    if (holidays) {
+      adapter.log.info("Got new holidays");
+      rules.setHolidays(holidays);
+    }
 
-
-  loadRulesSet((r) => {
-    rules.modifyRules(r);
-    rules.executeRules((error, values) => {
-      if (!error && values) {
-        adapter.log.debug(JSON.stringify(values));
-      } else {
-        adapter.log.error(error);
+    getCoordnates((coord) => {
+      if (coord) {
+        rules.setCoordinates(coord.latitude, coord.longitude);
+        adapter.log.info("Got coordinates!");
       }
+
+      loadRulesSet((r) => {
+
+        rules.modifyRules(r);
+        rules.executeRules((error, values) => {
+          if (!error && values) {
+            adapter.log.debug(JSON.stringify(values));
+          } else {
+            adapter.log.error(error);
+          }
+        });
+
+        setInterval(() => {
+          rules.executeRules((error, values) => {
+            if (!error && values) {
+              adapter.log.debug(JSON.stringify(values));
+            } else {
+              adapter.log.error(error);
+            }
+          })
+        }, adapter.config.pollInterval * 1000);
+      });
+
     });
+
   });
-
-
-  setInterval(() => {
-    rules.executeRules((error, values) => {
-      if (!error && values) {
-        adapter.log.debug(JSON.stringify(values));
-      } else {
-        adapter.log.error(error);
-      }
-    })
-  }, adapter.config.pollInterval * 1000);
 
 }
