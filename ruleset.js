@@ -33,6 +33,7 @@ adapter.on('message', (msg) => {
   let parameter = msg.message;
   let callback = msg.callback;
   let id = msg._id;
+  let r;
 
   switch (command) {
     case 'add':
@@ -48,8 +49,16 @@ adapter.on('message', (msg) => {
       rules.setHolidays(parameter);
       break;
     case 'save':
-      let r = rules.getRules();
+      r = rules.getRules();
       saveRulesSet(r);
+    case 'savea':
+      r = rules.getRules();
+      saveRulesSetAdpater(r);
+      break;
+    case 'loada':
+      loadRulesSetAdapter((r) => {
+        rules.modifyRules(r);
+      });
       break;
     default:
       break;
@@ -58,7 +67,7 @@ adapter.on('message', (msg) => {
   rules.executeRules((error, values) => {
     if (!error && values) {
       adapter.log.debug(JSON.stringify(values));
-    }  else if (error) {
+    } else if (error) {
       adapter.log.error(error);
     }
   });
@@ -148,16 +157,18 @@ function loadHoliday(callback) {
 // *****************************************************************************************************
 // Relgelwerg speichern
 // *****************************************************************************************************
-function saveRulesSetOld(ruleset) {
+function saveRulesSetAdpater(ruleset) {
   if (ruleset) {
     let id = "config.ruleset";
     ruleset = JSON.stringify(ruleset);
-    adapter.log.info("Saving Ruleset");
+    adapter.log.info("Saving Ruleset (Adapter)");
     adapter.setState(id, ruleset, true, function (err) {
       if (!err) {
         adapter.log.info("Saving Ruleset successfull");
       }
     });
+  } else {
+    adapter.log.info("Nothing to save");
   }
 }
 
@@ -165,9 +176,9 @@ function saveRulesSetOld(ruleset) {
 // *****************************************************************************************************
 // Relgelwerg speichern
 // *****************************************************************************************************
-function loadRulesSetOld(callback) {
+function loadRulesSetAdapter(callback) {
   let id = "config.ruleset";
-  adapter.log.info("Loading Ruleset");
+  adapter.log.info("Loading Ruleset (Adapter)");
   adapter.getState(id, function (err, state) {
     if (!err && state && state.val) {
       state = JSON.parse(state.val);
@@ -213,13 +224,13 @@ function loadRulesSet(callback) {
 // *****************************************************************************************************
 // show Rules
 // *****************************************************************************************************
-function showRules() {
-  let r = rules.getRules();
+function showRules(r) {
+  if (!r) r = rules.getRules();
   let count = 0;
-  for(let i in r) {
-    if(r[i].rulename) {
+  for (let i in r) {
+    if (r[i].rulename) {
       count++;
-      adapter.log.info(count + ".) Load Rule " + r[i].rulename + ", Aktiv: " + r[i].active );
+      adapter.log.info(count + ".) Load Rule " + r[i].rulename + ", Aktiv: " + r[i].active);
     }
   }
 }
@@ -252,7 +263,6 @@ function main() {
   });
 
 
-
   // on every Start get Holidays
   getFeiertag(cal, (holidays) => {
     if (holidays) {
@@ -269,11 +279,11 @@ function main() {
       loadRulesSet((r) => {
 
         rules.modifyRules(r);
-        showRules();
+        // showRules();
         rules.executeRules((error, values) => {
           if (!error && values) {
             adapter.log.debug(JSON.stringify(values));
-          }  else if (error) {
+          } else if (error) {
             adapter.log.error(error);
           }
         });
