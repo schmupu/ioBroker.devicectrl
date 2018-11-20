@@ -47,12 +47,13 @@ adapter.on('message', (msg) => {
     case 'holiday':
       rules.setHolidays(parameter);
       break;
+    case 'save':
+      let r = rules.getRules();
+      saveRulesSet(r);
+      break;
     default:
       break;
   }
-
-  let r = rules.getRules();
-  saveRulesSet(r);
 
   rules.executeRules((error, values) => {
     if (!error && values) {
