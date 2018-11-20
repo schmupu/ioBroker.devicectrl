@@ -58,7 +58,7 @@ adapter.on('message', (msg) => {
   rules.executeRules((error, values) => {
     if (!error && values) {
       adapter.log.debug(JSON.stringify(values));
-    } else {
+    }  else if (error) {
       adapter.log.error(error);
     }
   });
@@ -258,7 +258,7 @@ function main() {
         rules.executeRules((error, values) => {
           if (!error && values) {
             adapter.log.debug(JSON.stringify(values));
-          } else {
+          }  else if (error) {
             adapter.log.error(error);
           }
         });
@@ -267,7 +267,7 @@ function main() {
           rules.executeRules((error, values) => {
             if (!error && values) {
               adapter.log.debug(JSON.stringify(values));
-            } else {
+            } else if (error) {
               adapter.log.error(error);
             }
           })
