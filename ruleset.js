@@ -42,9 +42,6 @@ adapter.on('message', (msg) => {
     case 'delete':
       rules.deleteRule(parameter);
       break;
-    case 'modify':
-      rules.modifyRule(parameter);
-      break;
     case 'holiday':
       rules.setHolidays(parameter);
       break;
@@ -57,7 +54,7 @@ adapter.on('message', (msg) => {
       break;
     case 'loada':
       loadRulesSetAdapter((r) => {
-        rules.modifyRules(r);
+        rules.addRules(r);
       });
       break;
     default:
@@ -72,7 +69,7 @@ adapter.on('message', (msg) => {
     }
   });
 
-  adapter.sendTo(msg.from, msg.command, "command", msg.callback);
+  adapter.sendTo(msg.from, msg.command, "Execute command " + command, msg.callback);
 
 });
 
@@ -278,7 +275,7 @@ function main() {
 
       loadRulesSet((r) => {
 
-        rules.modifyRules(r);
+        rules.addRules(r);
         // showRules();
         rules.executeRules((error, values) => {
           if (!error && values) {
