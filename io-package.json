@@ -2,6 +2,7 @@
   "common": {
     "name": "ruleset",
     "version": "0.1.0",
+    "title": "Ruleset for controling devices",
     "news": {
       "0.1.0": {
         "en": "First version",
