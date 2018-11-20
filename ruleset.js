@@ -210,6 +210,20 @@ function loadRulesSet(callback) {
   });
 }
 
+// *****************************************************************************************************
+// show Rules
+// *****************************************************************************************************
+function showRules() {
+  let r = rules.getRules();
+  let count = 0;
+  for(let i in r) {
+    if(r[i].rulename) {
+      count++;
+      adapter.log.info(count + ".) Load Rule " + r[i].rulename + ", Aktiv: " + r[i].active );
+    }
+  }
+}
+
 
 // *****************************************************************************************************
 // Main
@@ -255,6 +269,7 @@ function main() {
       loadRulesSet((r) => {
 
         rules.modifyRules(r);
+        showRules();
         rules.executeRules((error, values) => {
           if (!error && values) {
             adapter.log.debug(JSON.stringify(values));
