@@ -1,6 +1,6 @@
 ![Logo](admin/devicectrl.png)
 
-# ioBroker device control  Adapter
+# ioBroker adapter to control devices
 
 
 [![Travis CI Build Status](https://travis-ci.org/schmupu/ioBroker.devicectrl.svg?branch=master)](https://travis-ci.org/schmupu/ioBroker.devicectrl)
