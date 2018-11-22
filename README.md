@@ -1,14 +1,14 @@
-![Logo](admin/ruleset.png)
+![Logo](admin/devicectrl.png)
 
-# ioBroker ruleset Adapter
+# ioBroker device control  Adapter
 
 
-[![Travis CI Build Status](https://travis-ci.org/schmupu/ioBroker.ruleset.svg?branch=master)](https://travis-ci.org/schmupu/ioBroker.ruleset)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/schmupu/ioBroker.ruleset?branch=master&svg=true)](https://ci.appveyor.com/project/schmupu/ioBroker-ruleset/)
-[![NPM version](http://img.shields.io/npm/v/iobroker.ruleset.svg)](https://www.npmjs.com/package/iobroker.ruleset)
-[![Downloads](https://img.shields.io/npm/dm/iobroker.ruleset.svg)](https://www.npmjs.com/package/iobroker.ruleset)
+[![Travis CI Build Status](https://travis-ci.org/schmupu/ioBroker.devicectrl.svg?branch=master)](https://travis-ci.org/schmupu/ioBroker.devicectrl)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/schmupu/ioBroker.devicectrl?branch=master&svg=true)](https://ci.appveyor.com/project/schmupu/ioBroker-devicectrl/)
+[![NPM version](http://img.shields.io/npm/v/iobroker.devicectrl.svg)](https://www.npmjs.com/package/iobroker.devicectrl)
+[![Downloads](https://img.shields.io/npm/dm/iobroker.devicectrl.svg)](https://www.npmjs.com/package/iobroker.devicectrl)
 
-[![NPM](https://nodei.co/npm/iobroker.ruleset.png?downloads=true)](https://nodei.co/npm/iobroker.ruleset/)
+[![NPM](https://nodei.co/npm/iobroker.devicectrl.png?downloads=true)](https://nodei.co/npm/iobroker.devicectrl/)
 
 ...
 

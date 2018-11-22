@@ -1,8 +1,8 @@
 {
   "common": {
-    "name": "ruleset",
+    "name": "devicectrl",
     "version": "0.1.1",
-    "title": "Ruleset for controling devices",
+    "title": "Device Controler",
     "news": {
       "0.1.1": {
         "en": "First version",
@@ -10,12 +10,12 @@
       }
     },
     "titleLang": {
-      "en": "Ruleset",
-      "de": "Ruleset"
+      "en": "Device Controler",
+      "de": "Gerätesteuerung"
     },
     "desc": {
-      "en": "Ruleset",
-      "de": "Ruleset"
+      "en": "Device Controler",
+      "de": "Geräte Steuerung"
     },
     "license": "MIT",
     "authors": [
@@ -26,14 +26,14 @@
     "messagebox": true,
     "stopBeforeUpdate": true,
     "subscribe": "messagebox",
-    "icon": "ruleset.png",
+    "icon": "devicectrl.png",
     "materialize": true,
     "enabled": true,
-    "extIcon": "https://raw.githubusercontent.com/schmupu/ioBroker.ruleset/master/admin/ruleset.png",
+    "extIcon": "https://raw.githubusercontent.com/schmupu/ioBroker.devicectrl/master/admin/devicectrl.png",
     "keywords": [
-      "ruleset"
+      "devicectrl"
     ],
-    "readme": "https://github.com/schmupu/ioBroker.ruleset/blob/master/README.md",
+    "readme": "https://github.com/schmupu/ioBroker.devicectrl/blob/master/README.md",
     "loglevel": "info",
     "type": "logic",
     "restartAdapters": []
