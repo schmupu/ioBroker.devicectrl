@@ -37,10 +37,16 @@ adapter.on('message', (msg) => {
 
   switch (command) {
     case 'add':
-      rules.addRule(parameter);
+      if (parameter) {
+        adapter.log.info("Add Rule : " + parameter.rulename);
+        rules.addRule(parameter);
+      }
       break;
     case 'delete':
-      rules.deleteRule(parameter);
+      if (parameter) {
+        adapter.log.info("Delete Rule : " + parameter);
+        rules.deleteRule(parameter);
+      }
       break;
     case 'holiday':
       rules.setHolidays(parameter);
