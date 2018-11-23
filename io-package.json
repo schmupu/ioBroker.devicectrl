@@ -1,10 +1,10 @@
 {
   "common": {
     "name": "devicectrl",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "title": "Device Controler",
     "news": {
-      "0.1.1": {
+      "0.1.2": {
         "en": "First version",
         "de": "Erste Version"
       }
