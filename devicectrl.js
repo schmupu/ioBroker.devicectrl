@@ -238,6 +238,26 @@ function showRules(r) {
   }
 }
 
+// *****************************************************************************************************
+// Execute Rules
+// *****************************************************************************************************
+function executeRules(rules) {
+  let simulation = adapter.config.simulation || false;
+  rules.executeRules((error, values) => {
+    if (!error && values) {
+      adapter.log.debug(JSON.stringify(values));
+      if(simulation) {
+        adapter.log.info("Simulation " + values.rulename + ", alte Regel " + values.oldRegel + ", neue Regel " + values.regel + ", von altem Wert " + values.oldValue + " auf neuen Wert " + values.value);                         
+      } else {
+        adapter.log.info(values.rulename + ", alte Regel " + values.oldRegel + ", neue Regel " + values.regel + ", von altem Wert " + values.oldValue + " auf neuen Wert " + values.value);                                
+      }
+    } else if (error) {
+      adapter.log.error(error);
+    }
+  })
+
+}
+
 
 // *****************************************************************************************************
 // Main
@@ -283,6 +303,7 @@ function main() {
 
         rules.addRules(r);
         // showRules();
+        executeRules(rules);
         rules.executeRules((error, values) => {
           if (!error && values) {
             adapter.log.debug(JSON.stringify(values));
@@ -292,6 +313,7 @@ function main() {
         });
 
         setInterval(() => {
+          executeRules(rules);
           rules.executeRules((error, values) => {
             if (!error && values) {
               adapter.log.debug(JSON.stringify(values));
