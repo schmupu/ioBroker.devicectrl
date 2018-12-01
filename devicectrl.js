@@ -67,14 +67,7 @@ adapter.on('message', (msg) => {
       break;
   }
 
-  rules.executeRules((error, values) => {
-    if (!error && values) {
-      adapter.log.debug(JSON.stringify(values));
-    } else if (error) {
-      adapter.log.error(error);
-    }
-  });
-
+  executeRules(rules);
   adapter.sendTo(msg.from, msg.command, "Execute command " + command, msg.callback);
 
 });
@@ -246,7 +239,7 @@ function executeRules(rules) {
   rules.executeRules((error, values) => {
     if (!error && values) {
       adapter.log.debug(JSON.stringify(values));
-      if(simulation) {
+      if (simulation) {
         // adapter.log.info("Simulation " + values.rulename + ", alte Regel " + values.oldRegel + ", neue Regel " + values.regel + ", von altem Wert " + values.oldValue + " auf neuen Wert " + values.value);                         
       } else {
         // adapter.log.info(values.rulename + ", alte Regel " + values.oldRegel + ", neue Regel " + values.regel + ", von altem Wert " + values.oldValue + " auf neuen Wert " + values.value);                                
@@ -304,23 +297,10 @@ function main() {
         rules.addRules(r);
         // showRules();
         executeRules(rules);
-        rules.executeRules((error, values) => {
-          if (!error && values) {
-            adapter.log.debug(JSON.stringify(values));
-          } else if (error) {
-            adapter.log.error(error);
-          }
-        });
+
 
         setInterval(() => {
           executeRules(rules);
-          rules.executeRules((error, values) => {
-            if (!error && values) {
-              adapter.log.debug(JSON.stringify(values));
-            } else if (error) {
-              adapter.log.error(error);
-            }
-          })
         }, adapter.config.pollInterval * 1000);
       });
 
