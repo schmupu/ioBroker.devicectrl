@@ -25,7 +25,8 @@
   "dependencies": {
     "node-schedule": "1.3.0",
     "request": "^2.85.0",
-    "suncalc": "^1.8.0"
+    "suncalc": "^1.8.0",
+    "@iobroker/adapter-core": "^1.0.1"
   },
   "devDependencies": {
     "gulp": "^3.9.1",

@@ -1,6 +1,11 @@
+/* jshint -W097 */
+/* jshint -W030 */
+/* jshint strict:true */
+/* jslint node: true */
+/* jslint esversion: 6 */
 'use strict';
 
-var utils = require(__dirname + '/lib/utils'); // Get common adapter utils
+const utils   = require('@iobroker/adapter-core'); 
 var dp = require(__dirname + '/lib/datapoints');
 var rulesset = require(__dirname + '/lib/rules');
 var net = require('net');
@@ -54,6 +59,7 @@ adapter.on('message', (msg) => {
     case 'save':
       r = rules.getRules();
       saveRulesSet(r);
+      break;
     case 'savea':
       r = rules.getRules();
       saveRulesSetAdpater(r);
@@ -106,6 +112,16 @@ function getFeiertag(state, callback, year) {
 // Get coordinates
 // *****************************************************************************************************
 function getCoordnates(callback) {
+
+  adapter.getForeignStateAsync('system.config').then(result => {
+    let a = result;
+    // do something with the result
+  }).catch(e => {
+    // something went wrong
+  });
+
+
+
   adapter.getForeignObject('system.config', (error, states) => {
     if (states.common.latitude && states.common.longitude) {
       callback && callback({ latitude: states.common.latitude, longitude: states.common.longitude });
@@ -247,7 +263,7 @@ function executeRules(rules) {
     } else if (error) {
       adapter.log.error(error);
     }
-  })
+  });
 
 }
 
