@@ -6,11 +6,8 @@
 'use strict';
 
 const utils = require('@iobroker/adapter-core');
-var dp = require(__dirname + '/lib/datapoints');
 var rulesset = require(__dirname + '/lib/rules');
-var net = require('net');
 var adapter = new utils.Adapter('devicectrl');
-var vm = require('vm');
 var rules = null;
 var request = require("request");
 var sched = require("node-schedule");
@@ -205,6 +202,24 @@ function loadHoliday(callback) {
   });
 }
 
+
+// *****************************************************************************************************
+// Relgelwerg speichern Async
+// *****************************************************************************************************
+async function loadHolidayAsync() {
+  return new Promise((resolve, reject) => {
+    let id = "config.holiday";
+    adapter.log.info("Loading Holidays");
+    adapter.getState(id, function (err, state) {
+      if (!err && state && state.val) {
+        state = JSON.parse(state.val);
+        resolve(state || []);
+      } else {
+        resolve([]);
+      }
+    });
+  });
+}
 
 // *****************************************************************************************************
 // Relgelwerg speichern
@@ -450,6 +465,7 @@ function mainAsync() {
         if (holidays) {
           adapter.log.info("Got new holidays");
           rules.setHolidays(holidays);
+          saveHolidays(holidays); 
         }
         let coord = await getCoordnatesAsync();
         if (coord) {
@@ -464,6 +480,7 @@ function mainAsync() {
     if (holidays) {
       adapter.log.info("Got new holidays");
       rules.setHolidays(holidays);
+      saveHolidays(holidays); 
     }
 
     let coord = await getCoordnatesAsync()
