@@ -5,7 +5,7 @@
 /* jslint esversion: 6 */
 'use strict';
 
-const utils   = require('@iobroker/adapter-core'); 
+const utils = require('@iobroker/adapter-core');
 var dp = require(__dirname + '/lib/datapoints');
 var rulesset = require(__dirname + '/lib/rules');
 var net = require('net');
@@ -65,9 +65,15 @@ adapter.on('message', (msg) => {
       saveRulesSetAdpater(r);
       break;
     case 'loada':
+      /*
       loadRulesSetAdapter((r) => {
         rules.addRules(r);
       });
+      */
+      (async () => {
+        let r = await loadRulesSetAdapterAsync();
+        rules.addRules(r);
+      })();
       break;
     default:
       break;
@@ -84,13 +90,12 @@ adapter.on('message', (msg) => {
 // start here!
 // *****************************************************************************************************
 adapter.on('ready', () => {
-  main();
+  mainAsync();
 });
 
 // *****************************************************************************************************
 // Read holidays
 // *****************************************************************************************************
-
 function getFeiertag(state, callback, year) {
 
   if (state) {
@@ -106,6 +111,26 @@ function getFeiertag(state, callback, year) {
     });
   }
 
+}
+
+// *****************************************************************************************************
+// Read holidays Async
+// *****************************************************************************************************
+async function getFeiertagAsync(state, year) {
+  return new Promise((resolve, reject) => {
+    if (state) {
+      if (!year) year = (new Date()).getFullYear();
+      let url = "https://ipty.de/feiertag/api.php?do=getFeiertage&loc=" + state + "&jahr=" + year + "&outformat=Y-m-d";
+      request({ url: url }, function (error, response, body) {
+        if (body) {
+          let result = JSON.parse(body);
+          resolve(result);
+        } else {
+          resolve(null);
+        }
+      });
+    }
+  });
 }
 
 // *****************************************************************************************************
@@ -128,6 +153,21 @@ function getCoordnates(callback) {
     } else {
       callback && callback();
     }
+  });
+}
+
+// *****************************************************************************************************
+// Get coordinates Async
+// *****************************************************************************************************
+async function getCoordnatesAsync(callback) {
+  return new Promise((resolve, reject) => {
+    adapter.getForeignObject('system.config', (error, states) => {
+      if (states.common.latitude && states.common.longitude) {
+        resolve({ latitude: states.common.latitude, longitude: states.common.longitude });
+      } else {
+        resolve(null);
+      }
+    });
   });
 }
 
@@ -202,6 +242,24 @@ function loadRulesSetAdapter(callback) {
 }
 
 // *****************************************************************************************************
+// Relgelwerg speichern Async
+// *****************************************************************************************************
+async function loadRulesSetAdapterAsync() {
+  return new Promise((resolve, reject) => {
+    let id = "config.ruleset";
+    adapter.log.info("Loading Ruleset (Adapter)");
+    adapter.getState(id, function (err, state) {
+      if (!err && state && state.val) {
+        state = JSON.parse(state.val);
+        resolve(state || []);
+      } else {
+        resolve([]);
+      }
+    });
+  });
+}
+
+// *****************************************************************************************************
 // Relgelwerg speichern
 // *****************************************************************************************************
 function saveRulesSet(ruleset) {
@@ -230,6 +288,24 @@ function loadRulesSet(callback) {
     } else {
       callback && callback([]);
     }
+  });
+}
+
+// *****************************************************************************************************
+// Relgelwerg speichern Async
+// *****************************************************************************************************
+async function loadRulesSetAsync() {
+  return new Promise((resolve, reject) => {
+    let id = "system.adapter." + adapter.namespace;
+    adapter.log.info("Loading Ruleset");
+    adapter.getForeignObject(id, function (err, obj) {
+      if (!err) {
+        adapter.log.info("Loading Ruleset successfull");
+        resolve(obj.native.ruleset || []);
+      } else {
+        resolve([]);
+      }
+    });
   });
 }
 
@@ -264,7 +340,30 @@ function executeRules(rules) {
       adapter.log.error(error);
     }
   });
+}
 
+// *****************************************************************************************************
+// Execute Rules Async
+// *****************************************************************************************************
+function executeRulesAsync(rules) {
+  (async () => {
+    try {
+      let simulation = adapter.config.simulation || false;
+      let values = await rules.executeRulesAsync();
+
+      if (values) {
+        adapter.log.debug(JSON.stringify(values));
+        if (simulation) {
+          // adapter.log.info("Simulation " + values.rulename + ", alte Regel " + values.oldRegel + ", neue Regel " + values.regel + ", von altem Wert " + values.oldValue + " auf neuen Wert " + values.value);                         
+        } else {
+          // adapter.log.info(values.rulename + ", alte Regel " + values.oldRegel + ", neue Regel " + values.regel + ", von altem Wert " + values.oldValue + " auf neuen Wert " + values.value);                                
+        }
+      }
+
+    } catch (error) {
+      adapter.log.error(error);
+    }
+  })();
 }
 
 
@@ -272,9 +371,14 @@ function executeRules(rules) {
 // Main
 // *****************************************************************************************************
 function main() {
-  rules = new rulesset(adapter);
+  rules = new rulesset.RulesControler(adapter);
   let cal = adapter.config.holiday || 'HH';
   let simulation = adapter.config.simulation || false;
+
+  (async () => {
+    let ba = await test();
+    let a = ba;
+  })();
 
   adapter.log.info("Starting Adapter");
 
@@ -323,5 +427,61 @@ function main() {
     });
 
   });
+
+}
+
+// *****************************************************************************************************
+// Main
+// *****************************************************************************************************
+function mainAsync() {
+
+  (async () => {
+
+    rules = new rulesset.RulesControlerAsync(adapter);
+    let cal = adapter.config.holiday || 'HH';
+    let simulation = adapter.config.simulation || false;
+
+    adapter.log.info("Starting Adapter");
+
+    //Get every Jear new Hollidays
+    sched.scheduleJob('1 0 * * *', () => {
+      (async () => {
+        let holidays = await getFeiertagAsync(cal);
+        if (holidays) {
+          adapter.log.info("Got new holidays");
+          rules.setHolidays(holidays);
+        }
+        let coord = await getCoordnatesAsync();
+        if (coord) {
+          rules.setCoordinates(coord.latitude, coord.longitude);
+          adapter.log.info("Got coordinates!");
+        }
+      })();
+    });
+
+    // on every Start get Holidays
+    let holidays = await getFeiertagAsync(cal);
+    if (holidays) {
+      adapter.log.info("Got new holidays");
+      rules.setHolidays(holidays);
+    }
+
+    let coord = await getCoordnatesAsync()
+    if (coord) {
+      rules.setCoordinates(coord.latitude, coord.longitude);
+      adapter.log.info("Got coordinates!");
+    }
+
+    let r = await loadRulesSetAsync()
+    rules.addRules(r);
+    // showRules();
+    await executeRulesAsync(rules);
+    setInterval(() => {
+      (async () => {
+        await executeRulesAsync(rules);
+      })();
+    }, adapter.config.pollInterval * 1000);
+
+  })();
 
 }

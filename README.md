@@ -18,6 +18,9 @@
 
 ## Changelog
 
+### 0.1.3 (23.11.2018)
+* (Stübi) changed to async functions
+
 ### 0.1.2 (23.11.2018)
 * (Stübi) First Version
 
