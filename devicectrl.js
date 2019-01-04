@@ -134,18 +134,8 @@ async function getFeiertagAsync(state, year) {
 // Get coordinates
 // *****************************************************************************************************
 function getCoordnates(callback) {
-
-  adapter.getForeignStateAsync('system.config').then(result => {
-    let a = result;
-    // do something with the result
-  }).catch(e => {
-    // something went wrong
-  });
-
-
-
   adapter.getForeignObject('system.config', (error, states) => {
-    if (states.common.latitude && states.common.longitude) {
+    if (!error) {
       callback && callback({ latitude: states.common.latitude, longitude: states.common.longitude });
     } else {
       callback && callback();
@@ -156,16 +146,17 @@ function getCoordnates(callback) {
 // *****************************************************************************************************
 // Get coordinates Async
 // *****************************************************************************************************
-async function getCoordnatesAsync(callback) {
-  return new Promise((resolve, reject) => {
-    adapter.getForeignObject('system.config', (error, states) => {
-      if (states.common.latitude && states.common.longitude) {
-        resolve({ latitude: states.common.latitude, longitude: states.common.longitude });
-      } else {
-        resolve(null);
-      }
-    });
-  });
+async function getCoordnatesAsync() {
+  try {
+    let states = await adapter.getForeignObjectAsync('system.config');
+    if (states && states.common && states.common.latitude && states.common.longitude) {
+      return { latitude: states.common.latitude, longitude: states.common.longitude };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    return null;
+  }
 }
 
 
@@ -465,7 +456,7 @@ function mainAsync() {
         if (holidays) {
           adapter.log.info("Got new holidays");
           rules.setHolidays(holidays);
-          saveHolidays(holidays); 
+          saveHolidays(holidays);
         }
         let coord = await getCoordnatesAsync();
         if (coord) {
@@ -480,7 +471,7 @@ function mainAsync() {
     if (holidays) {
       adapter.log.info("Got new holidays");
       rules.setHolidays(holidays);
-      saveHolidays(holidays); 
+      saveHolidays(holidays);
     }
 
     let coord = await getCoordnatesAsync()
