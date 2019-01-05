@@ -6,89 +6,99 @@
 'use strict';
 
 const utils = require('@iobroker/adapter-core');
-var rulesset = require(__dirname + '/lib/rules');
-var adapter = new utils.Adapter('devicectrl');
-var rules = null;
-var request = require("request");
-var sched = require("node-schedule");
+const rulesset = require(__dirname + '/lib/rules');
+const request = require("request");
+const sched = require("node-schedule");
+const adapterName = require('./package.json').name.split('.').pop();
+let rules = null;
+let adapter;
 
-// *****************************************************************************************************
-// is called when adapter shuts down - callback has to be called under any circumstances!
-// *****************************************************************************************************
-adapter.on('unload', (callback) => {
-  try {
-    adapter.log.info('Closing Adapter');
-    callback();
-  } catch (e) {
-    // adapter.log.error('Error');
-    callback();
-  }
-});
+function startAdapter(options) {
+  options = options || {};
+  options.name = adapterName;
+  adapter = new utils.Adapter(options);
 
-
-// *****************************************************************************************************
-// Listen for sendTo messages
-// *****************************************************************************************************
-adapter.on('message', (msg) => {
-
-  let command = msg.command;
-  let parameter = msg.message;
-  let callback = msg.callback;
-  let id = msg._id;
-  let r;
-
-  switch (command) {
-    case 'add':
-      if (parameter) {
-        adapter.log.info("Add Rule : " + parameter.rulename);
-        rules.addRule(parameter);
-      }
-      break;
-    case 'delete':
-      if (parameter) {
-        adapter.log.info("Delete Rule : " + parameter);
-        rules.deleteRule(parameter);
-      }
-      break;
-    case 'holiday':
-      rules.setHolidays(parameter);
-      break;
-    case 'save':
-      r = rules.getRules();
-      saveRulesSet(r);
-      break;
-    case 'savea':
-      r = rules.getRules();
-      saveRulesSetAdpater(r);
-      break;
-    case 'loada':
-      /*
-      loadRulesSetAdapter((r) => {
-        rules.addRules(r);
-      });
-      */
-      (async () => {
-        let r = await loadRulesSetAdapterAsync();
-        rules.addRules(r);
-      })();
-      break;
-    default:
-      break;
-  }
-
-  executeRules(rules);
-  adapter.sendTo(msg.from, msg.command, "Execute command " + command, msg.callback);
-
-});
+  // *****************************************************************************************************
+  // is called when adapter shuts down - callback has to be called under any circumstances!
+  // *****************************************************************************************************
+  adapter.on('unload', (callback) => {
+    try {
+      adapter.log.info('Closing Adapter');
+      callback();
+    } catch (e) {
+      // adapter.log.error('Error');
+      callback();
+    }
+  });
 
 
-// *****************************************************************************************************
-// is called when databases are connected and adapter received configuration.
-// start here!
-// *****************************************************************************************************
-adapter.on('ready', () => {
-  mainAsync();
-});
+  // *****************************************************************************************************
+  // Listen for sendTo messages
+  // *****************************************************************************************************
+  adapter.on('message', (msg) => {
+
+    let command = msg.command;
+    let parameter = msg.message;
+    let callback = msg.callback;
+    let id = msg._id;
+    let r;
+
+    switch (command) {
+      case 'add':
+        if (parameter) {
+          adapter.log.info("Add Rule : " + parameter.rulename);
+          rules.addRule(parameter);
+        }
+        break;
+      case 'delete':
+        if (parameter) {
+          adapter.log.info("Delete Rule : " + parameter);
+          rules.deleteRule(parameter);
+        }
+        break;
+      case 'holiday':
+        rules.setHolidays(parameter);
+        break;
+      case 'save':
+        r = rules.getRules();
+        saveRulesSet(r);
+        break;
+      case 'savea':
+        r = rules.getRules();
+        saveRulesSetAdpater(r);
+        break;
+      case 'loada':
+        /*
+        loadRulesSetAdapter((r) => {
+          rules.addRules(r);
+        });
+        */
+        (async () => {
+          let r = await loadRulesSetAdapterAsync();
+          rules.addRules(r);
+        })();
+        break;
+      default:
+    }
+
+    executeRules(rules);
+    adapter.sendTo(msg.from, msg.command, "Execute command " + command, msg.callback);
+
+  });
+
+
+  // *****************************************************************************************************
+  // is called when databases are connected and adapter received configuration.
+  // start here!
+  // *****************************************************************************************************
+  adapter.on('ready', () => {
+    mainAsync();
+  });
+
+
+  return adapter;
+}
+
 
 // *****************************************************************************************************
 // Read holidays
@@ -492,4 +502,13 @@ function mainAsync() {
 
   })();
 
+}
+
+
+// If started as allInOne mode => return function to create instance
+if (typeof module !== undefined && module.parent) {
+  module.exports = startAdapter;
+} else {
+  // or start the instance directly
+  startAdapter();
 }

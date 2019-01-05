@@ -33,6 +33,7 @@
     "icon": "devicectrl.png",
     "materialize": true,
     "enabled": true,
+    "compact": true,
     "extIcon": "https://raw.githubusercontent.com/schmupu/ioBroker.devicectrl/master/admin/devicectrl.png",
     "keywords": [
       "devicectrl"
