@@ -81,7 +81,9 @@ function startAdapter(options) {
       default:
     }
 
-    executeRules(rules);
+    (async () => {
+      await executeRulesAsync(rules);
+    })();
     adapter.sendTo(msg.from, msg.command, "Execute command " + command, msg.callback);
 
   });
