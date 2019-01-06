@@ -36,56 +36,48 @@ function startAdapter(options) {
   // Listen for sendTo messages
   // *****************************************************************************************************
   adapter.on('message', (msg) => {
-
-    let command = msg.command;
-    let parameter = msg.message;
-    let callback = msg.callback;
-    let id = msg._id;
-    let r;
-
-    switch (command) {
-      case 'add':
-        if (parameter) {
-          adapter.log.info("Add Rule : " + parameter.rulename);
-          rules.addRule(parameter);
-        }
-        break;
-      case 'delete':
-        if (parameter) {
-          adapter.log.info("Delete Rule : " + parameter);
-          rules.deleteRule(parameter);
-        }
-        break;
-      case 'holiday':
-        rules.setHolidays(parameter);
-        break;
-      case 'save':
-        r = rules.getRules();
-        saveRulesSet(r);
-        break;
-      case 'savea':
-        r = rules.getRules();
-        saveRulesSetAdpater(r);
-        break;
-      case 'loada':
-        /*
-        loadRulesSetAdapter((r) => {
-          rules.addRules(r);
-        });
-        */
-        (async () => {
-          let r = await loadRulesSetAdapterAsync();
-          rules.addRules(r);
-        })();
-        break;
-      default:
-    }
-
     (async () => {
-      await executeRulesAsync(rules);
+      try {
+        let command = msg.command;
+        let parameter = msg.message;
+        let r = undefined;
+      
+        switch (command) {
+          case 'add':
+            if (parameter) {
+              adapter.log.info("Add Rule : " + parameter.rulename);
+              rules.addRule(parameter);
+            }
+            break;
+          case 'delete':
+            if (parameter) {
+              adapter.log.info("Delete Rule : " + parameter);
+              rules.deleteRule(parameter);
+            }
+            break;
+          case 'holiday':
+            rules.setHolidays(parameter);
+            break;
+          case 'save':
+            r = rules.getRules();
+            await saveRulesSetAsync(r);
+            break;
+          case 'savea':
+            r = rules.getRules();
+            await saveRulesSetAdpaterAsync(r);
+            break;
+          case 'loada':
+            r = await loadRulesSetAdapterAsync();
+            rules.addRules(r);
+            break;
+          default:
+        }
+        await executeRulesAsync(rules);
+        adapter.sendTo(msg.from, msg.command, "Execute command " + command, msg.callback);
+      } catch (error) {
+        adapter.log.error(error);
+      }
     })();
-    adapter.sendTo(msg.from, msg.command, "Execute command " + command, msg.callback);
-
   });
 
 
@@ -96,31 +88,9 @@ function startAdapter(options) {
   adapter.on('ready', () => {
     mainAsync();
   });
-
-
   return adapter;
 }
 
-
-// *****************************************************************************************************
-// Read holidays
-// *****************************************************************************************************
-function getFeiertag(state, callback, year) {
-
-  if (state) {
-    if (!year) year = (new Date()).getFullYear();
-    let url = "https://ipty.de/feiertag/api.php?do=getFeiertage&loc=" + state + "&jahr=" + year + "&outformat=Y-m-d";
-    request({ url: url }, function (error, response, body) {
-      if (body) {
-        let result = JSON.parse(body);
-        callback && callback(result);
-      } else {
-        callback && callback();
-      }
-    });
-  }
-
-}
 
 // *****************************************************************************************************
 // Read holidays Async
@@ -138,19 +108,6 @@ async function getFeiertagAsync(state, year) {
           resolve(null);
         }
       });
-    }
-  });
-}
-
-// *****************************************************************************************************
-// Get coordinates
-// *****************************************************************************************************
-function getCoordnates(callback) {
-  adapter.getForeignObject('system.config', (error, states) => {
-    if (!error) {
-      callback && callback({ latitude: states.common.latitude, longitude: states.common.longitude });
-    } else {
-      callback && callback();
     }
   });
 }
@@ -175,156 +132,103 @@ async function getCoordnatesAsync() {
 // *****************************************************************************************************
 // Save Holidays
 // *****************************************************************************************************
-function saveHolidays(holiday) {
+async function saveHolidaysAsync(holiday) {
   if (holiday) {
-    let id = "config.holiday";
-    holiday = JSON.stringify(holiday);
-    adapter.log.info("Saving Holidays");
-    adapter.setState(id, holiday, true, function (err) {
-      if (!err) {
-        adapter.log.info("Saving Holidays successfull");
-      }
-    });
+    try {
+      let id = "config.holiday";
+      holiday = JSON.stringify(holiday);
+      await adapter.setStateAsync(id, holiday, true);
+      adapter.log.info("Saving Holidays");
+    } catch (error) {
+      adapter.log.info("Error, saving Holidays");
+    }
   }
 }
 
-
 // *****************************************************************************************************
-// Relgelwerg speichern
-// *****************************************************************************************************
-function loadHoliday(callback) {
-  let id = "config.holiday";
-  adapter.log.info("Loading Holidays");
-  adapter.getState(id, function (err, state) {
-    if (!err && state && state.val) {
-      state = JSON.parse(state.val);
-      callback && callback(state || []);
-    } else {
-      callback && callback([]);
-    }
-  });
-}
-
-
-// *****************************************************************************************************
-// Relgelwerg speichern Async
+// Relgelwerg laden Async
 // *****************************************************************************************************
 async function loadHolidayAsync() {
-  return new Promise((resolve, reject) => {
-    let id = "config.holiday";
-    adapter.log.info("Loading Holidays");
-    adapter.getState(id, function (err, state) {
-      if (!err && state && state.val) {
-        state = JSON.parse(state.val);
-        resolve(state || []);
-      } else {
-        resolve([]);
-      }
-    });
-  });
-}
-
-// *****************************************************************************************************
-// Relgelwerg speichern
-// *****************************************************************************************************
-function saveRulesSetAdpater(ruleset) {
-  if (ruleset) {
-    let id = "config.ruleset";
-    ruleset = JSON.stringify(ruleset);
-    adapter.log.info("Saving Ruleset (Adapter)");
-    adapter.setState(id, ruleset, true, function (err) {
-      if (!err) {
-        adapter.log.info("Saving Ruleset successfull");
-      }
-    });
-  } else {
-    adapter.log.info("Nothing to save");
-  }
-}
-
-
-// *****************************************************************************************************
-// Relgelwerg speichern
-// *****************************************************************************************************
-function loadRulesSetAdapter(callback) {
-  let id = "config.ruleset";
-  adapter.log.info("Loading Ruleset (Adapter)");
-  adapter.getState(id, function (err, state) {
-    if (!err && state && state.val) {
+  try {
+    let state = await adapter.getStateAsync(id);
+    if (state && state.val) {
       state = JSON.parse(state.val);
-      callback && callback(state || []);
+      return state || [];
     } else {
-      callback && callback([]);
+      return [];
     }
-  });
+  } catch (error) {
+    return [];
+  }
 }
 
 // *****************************************************************************************************
 // Relgelwerg speichern Async
+// *****************************************************************************************************
+async function saveRulesSetAdpaterAsync(ruleset) {
+  if (ruleset) {
+    try {
+      let id = "config.ruleset";
+      ruleset = JSON.stringify(ruleset);
+      adapter.log.info("Saving Ruleset (Adapter)");
+      await adapter.setStateAsync(id, ruleset, true);
+      adapter.log.info("Saving Ruleset successfull");
+    } catch (error) {
+      adapter.log.info("Nothing to save");
+    }
+  }
+}
+
+// *****************************************************************************************************
+// Relgelwerg Laden Async
 // *****************************************************************************************************
 async function loadRulesSetAdapterAsync() {
-  return new Promise((resolve, reject) => {
+  try {
     let id = "config.ruleset";
     adapter.log.info("Loading Ruleset (Adapter)");
-    adapter.getState(id, function (err, state) {
-      if (!err && state && state.val) {
-        state = JSON.parse(state.val);
-        resolve(state || []);
-      } else {
-        resolve([]);
-      }
-    });
-  });
-}
-
-// *****************************************************************************************************
-// Relgelwerg speichern
-// *****************************************************************************************************
-function saveRulesSet(ruleset) {
-  if (ruleset) {
-    let id = "system.adapter." + adapter.namespace;
-    adapter.log.info("Saving Ruleset");
-    adapter.getForeignObject(id, function (err, obj) {
-      obj.native.ruleset = ruleset;
-      adapter.setForeignObject(id, obj, function (err) {
-        adapter.log.info("Saving Ruleset successfull");
-      });
-    });
-  }
-}
-
-// *****************************************************************************************************
-// Relgelwerg speichern
-// *****************************************************************************************************
-function loadRulesSet(callback) {
-  let id = "system.adapter." + adapter.namespace;
-  adapter.log.info("Loading Ruleset");
-  adapter.getForeignObject(id, function (err, obj) {
-    if (!err) {
-      adapter.log.info("Loading Ruleset successfull");
-      callback && callback(obj.native.ruleset || []);
+    let state = await adapter.getStateAsync(id);
+    if (state && state.val) {
+      state = JSON.parse(state.val);
+      return state || [];
     } else {
-      callback && callback([]);
+      return [];
     }
-  });
+  } catch (error) {
+    return [];
+  }
 }
 
 // *****************************************************************************************************
 // Relgelwerg speichern Async
 // *****************************************************************************************************
+async function saveRulesSetAsync(ruleset) {
+  if (ruleset) {
+    try {
+      let id = "system.adapter." + adapter.namespace;
+      adapter.log.info("Saving Ruleset");
+      let obj = await adapter.getForeignObjectAsync(id);
+      obj.native.ruleset = ruleset;
+      await adapter.setForeignObject(id, obj);
+      adapter.log.info("Saving Ruleset successfull");
+    } catch (error) {
+      adapter.log.eror("Erro saving Ruleset");
+    }
+  }
+}
+
+// *****************************************************************************************************
+// Relgelwerg load Async
+// *****************************************************************************************************
 async function loadRulesSetAsync() {
-  return new Promise((resolve, reject) => {
+  try {
     let id = "system.adapter." + adapter.namespace;
     adapter.log.info("Loading Ruleset");
-    adapter.getForeignObject(id, function (err, obj) {
-      if (!err) {
-        adapter.log.info("Loading Ruleset successfull");
-        resolve(obj.native.ruleset || []);
-      } else {
-        resolve([]);
-      }
-    });
-  });
+    let obj = await adapter.getForeignObjectAsync(id);
+    adapter.log.info("Loading Ruleset successfull");
+    return obj.native.ruleset || [];
+  } catch (error) {
+    return [];
+  }
 }
 
 // *****************************************************************************************************
@@ -339,25 +243,6 @@ function showRules(r) {
       adapter.log.info(count + ".) Load Rule " + r[i].rulename + ", Aktiv: " + r[i].active);
     }
   }
-}
-
-// *****************************************************************************************************
-// Execute Rules
-// *****************************************************************************************************
-function executeRules(rules) {
-  let simulation = adapter.config.simulation || false;
-  rules.executeRules((error, values) => {
-    if (!error && values) {
-      adapter.log.debug(JSON.stringify(values));
-      if (simulation) {
-        // adapter.log.info("Simulation " + values.rulename + ", alte Regel " + values.oldRegel + ", neue Regel " + values.regel + ", von altem Wert " + values.oldValue + " auf neuen Wert " + values.value);                         
-      } else {
-        // adapter.log.info(values.rulename + ", alte Regel " + values.oldRegel + ", neue Regel " + values.regel + ", von altem Wert " + values.oldValue + " auf neuen Wert " + values.value);                                
-      }
-    } else if (error) {
-      adapter.log.error(error);
-    }
-  });
 }
 
 // *****************************************************************************************************
@@ -388,69 +273,6 @@ function executeRulesAsync(rules) {
 // *****************************************************************************************************
 // Main
 // *****************************************************************************************************
-function main() {
-  rules = new rulesset.RulesControler(adapter);
-  let cal = adapter.config.holiday || 'HH';
-  let simulation = adapter.config.simulation || false;
-
-  (async () => {
-    let ba = await test();
-    let a = ba;
-  })();
-
-  adapter.log.info("Starting Adapter");
-
-  //Get every Jear new Hollidays
-  sched.scheduleJob('1 0 * * *', function () {
-    getFeiertag(cal, (holidays) => {
-      if (holidays) {
-        adapter.log.info("Got new holidays");
-        rules.setHolidays(holidays);
-      }
-    });
-    getCoordnates((coord) => {
-      if (coord) {
-        rules.setCoordinates(coord.latitude, coord.longitude);
-        adapter.log.info("Got coordinates!");
-      }
-    });
-  });
-
-
-  // on every Start get Holidays
-  getFeiertag(cal, (holidays) => {
-    if (holidays) {
-      adapter.log.info("Got new holidays");
-      rules.setHolidays(holidays);
-    }
-
-    getCoordnates((coord) => {
-      if (coord) {
-        rules.setCoordinates(coord.latitude, coord.longitude);
-        adapter.log.info("Got coordinates!");
-      }
-
-      loadRulesSet((r) => {
-
-        rules.addRules(r);
-        // showRules();
-        executeRules(rules);
-
-
-        setInterval(() => {
-          executeRules(rules);
-        }, adapter.config.pollInterval * 1000);
-      });
-
-    });
-
-  });
-
-}
-
-// *****************************************************************************************************
-// Main
-// *****************************************************************************************************
 function mainAsync() {
 
   (async () => {
@@ -468,7 +290,7 @@ function mainAsync() {
         if (holidays) {
           adapter.log.info("Got new holidays");
           rules.setHolidays(holidays);
-          saveHolidays(holidays);
+          await saveHolidaysAsync(holidays);
         }
         let coord = await getCoordnatesAsync();
         if (coord) {
@@ -483,7 +305,7 @@ function mainAsync() {
     if (holidays) {
       adapter.log.info("Got new holidays");
       rules.setHolidays(holidays);
-      saveHolidays(holidays);
+      await saveHolidaysAsync(holidays);
     }
 
     let coord = await getCoordnatesAsync()
