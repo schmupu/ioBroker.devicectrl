@@ -459,7 +459,7 @@ function mainAsync() {
     let cal = adapter.config.holiday || 'HH';
     let simulation = adapter.config.simulation || false;
 
-    adapter.log.info("Starting Adapter");
+    adapter.log.info("Starting Adapter " + adapter.namespace + " in version " + adapter.version);
 
     //Get every Jear new Hollidays
     sched.scheduleJob('1 0 * * *', () => {
