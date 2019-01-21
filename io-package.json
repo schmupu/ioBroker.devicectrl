@@ -1,9 +1,13 @@
 {
   "common": {
     "name": "devicectrl",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "title": "Device Controler",
     "news": {
+      "0.1.4": {
+        "en": "Delete old functions",
+        "de": "Löschen alter Funktionen"
+      },
       "0.1.3": {
         "en": "Changed to async functions",
         "de": "Änderungen zum Async Funktionen"
