@@ -48,13 +48,13 @@ function startAdapter(options) {
           case 'add':
             if (parameter) {
               adapter.log.info('Add Rule : ' + parameter.rulename);
-              rules.addRule(parameter);
+              await rules.addRule(parameter);
             }
             break;
           case 'delete':
             if (parameter) {
               adapter.log.info('Delete Rule : ' + parameter);
-              rules.deleteRule(parameter);
+              await rules.deleteRule(parameter);
             }
             break;
           case 'holiday':
@@ -70,7 +70,7 @@ function startAdapter(options) {
             break;
           case 'loada':
             r = await loadRulesSetAdapterAsync();
-            rules.addRules(r);
+            await rules.addRules(r);
             break;
           default:
         }
