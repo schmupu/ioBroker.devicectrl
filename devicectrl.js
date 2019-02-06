@@ -7,13 +7,15 @@
 
 const utils = require('@iobroker/adapter-core');
 const rulesset = require(__dirname + '/lib/rules');
+const setenum = require(__dirname + '/lib/set');
 const request = require('request');
 const sched = require('node-schedule');
 const semver = require('semver');
 const adapterName = require('./package.json').name.split('.').pop();
 const adapterNodeVer = require('./package.json').engines.node;
 
-let rules = null;
+let rules = undefined;
+let set = undefined;
 let adapter;
 
 function startAdapter(options) {
@@ -42,6 +44,7 @@ function startAdapter(options) {
       try {
         let command = msg.command;
         let parameter = msg.message;
+        let callback = msg.callback;
         let r = undefined;
 
         switch (command) {
@@ -59,23 +62,33 @@ function startAdapter(options) {
             break;
           case 'holiday':
             rules.setHolidays(parameter);
+            await saveHolidaysAsync(parameter);
             break;
           case 'save':
             r = rules.getRules();
+            await saveRulesSetAdpaterAsync(r); // Aus Adapter lesen (Test)
             await saveRulesSetAsync(r);
             break;
-          case 'savea':
-            r = rules.getRules();
-            await saveRulesSetAdpaterAsync(r);
-            break;
-          case 'loada':
-            r = await loadRulesSetAdapterAsync();
+          case 'load':
+            r = await loadRulesSetAdapterAsync();  // in  Adapter schreiben (Test)
+            r = await loadRulesSetAsync();
             await rules.addRules(r);
+            break;
+          case 'addset':
+            await set.addRule(parameter);
+            break;
+          case 'saveset':
+            r = set.getRules();
+            await saveExecuteSetAdpaterAsync(r);
+            break;
+          case 'loadset':
+            r = await loadExecuteSetAdapterAsync();
+            await set.addRules(r);
             break;
           default:
         }
         await executeRulesAsync(rules);
-        adapter.sendTo(msg.from, msg.command, 'Execute command ' + command, msg.callback);
+        adapter.sendTo(msg.from, msg.command, 'Execute command ' + command, callback);
       } catch (error) {
         adapter.log.error(error);
       }
@@ -165,6 +178,23 @@ async function loadHolidayAsync() {
 // *****************************************************************************************************
 // Relgelwerg speichern Async
 // *****************************************************************************************************
+async function saveExecuteSetAdpaterAsync(ruleset) {
+  if (ruleset) {
+    try {
+      let id = 'config.executeset';
+      ruleset = JSON.stringify(ruleset);
+      adapter.log.info('Saving Execute Ruleset (Adapter)');
+      await adapter.setStateAsync(id, ruleset, true);
+      adapter.log.info('Saving Execute Ruleset successfull');
+    } catch (error) {
+      adapter.log.info('Nothing to save');
+    }
+  }
+}
+
+// *****************************************************************************************************
+// Relgelwerg speichern Async
+// *****************************************************************************************************
 async function saveRulesSetAdpaterAsync(ruleset) {
   if (ruleset) {
     try {
@@ -176,6 +206,25 @@ async function saveRulesSetAdpaterAsync(ruleset) {
     } catch (error) {
       adapter.log.info('Nothing to save');
     }
+  }
+}
+
+// *****************************************************************************************************
+// Relgelwerg Laden Async
+// *****************************************************************************************************
+async function loadExecuteSetAdapterAsync() {
+  try {
+    let id = 'config.executeset';
+    adapter.log.info('Loading Ruleset (Adapter)');
+    let state = await adapter.getStateAsync(id);
+    if (state && state.val) {
+      state = JSON.parse(state.val);
+      return state || [];
+    } else {
+      return [];
+    }
+  } catch (error) {
+    return [];
   }
 }
 
@@ -269,53 +318,41 @@ function executeRulesAsync(rules) {
   })();
 }
 
-// *****************************************************************************************************
-// Intersection of 2 Arrays
-// *****************************************************************************************************
-function intersection(array1, array2) {
-  return array1.filter((value) => -1 !== array2.indexOf(value));
-}
-
-function intersectionArrays(arraylist) {
-  let array1 = arraylist.shift();
-  let array2;
-  while ((array2 = arraylist.shift())) {
-    array1 = intersection(array1, array2);
-  }
-  return array1;
-}
-
-// *****************************************************************************************************
-// Get List of all state id for enum
-// *****************************************************************************************************
-async function getStateIdfromEnums(enums) {
-  let ret = [];
-  let objs = await adapter.getForeignObjectsAsync('*', 'state');
-  enums = (typeof enums === 'string') ? [enums] : enums;
-  for (let o in objs) {
-    let e = objs[o].enums;
-    if (e && Object.keys(e).length !== 0) {
-      for (let i in enums) {
-        if (e.hasOwnProperty(enums[i])) {
-          ret.push(o);
-          break;
-        }
-      }
-    }
-  }
-  return ret;
-}
 
 async function test() {
 
-  let ems = await adapter.getEnumsAsync('functions.light');
+  let test = {
+
+    rulename: 'Heizung Esszimmer',
+    active: true,
+    timeout: 5,
+    intersection: true,
+    dutycycle: { id: 'javascript.0.test.roller', maxvalue: 70 },
+    enum: [
+      'enum.functions.light',
+      'enum.rooms.living_room'
+    ],
+    idss: [
+      'javascript.0.test.roller'
+    ]
+  };
+
+  await set.addRule(test);
+  let ids = await set.getIdsByRulename('Heizung Esszimmer');
+
+  let ems = await adapter.getEnumsAsync('enum.rooms');
   adapter.log.info(JSON.stringify(ems));
-  let em = await adapter.getEnumAsync('functions.light');
+  let em = await adapter.getEnumAsync('enum.functions');
   adapter.log.info(JSON.stringify(em));
 
-  let objs1 = await getStateIdfromEnums('enum.functions.light');
-  let objs2 = await getStateIdfromEnums('enum.rooms.living_room');
-  let objs3 = intersectionArrays([objs2, objs1, objs2, objs1]);
+  let objs1 = await set.getStateIdfromEnums('enum.functions.light');
+  let objs2 = await set.getStateIdfromEnums('enum.rooms.living_room');
+  let objs3 = await set.getStateIdfromEnumsIntersection(['enum.functions.light', 'enum.rooms.living_room', 'enum.rooms.living_room', 'enum.functions.light']);
+  let objs4 = await set.getStateIdfromEnumsIntersection(['enum.rooms.living_room', 'enum.functions.light']);
+
+  let rs = set.getRules();
+
+  // let objs3 = intersectionArrays([objs2, objs1, objs2, objs1]);
   adapter.log.info(JSON.stringify(objs3));
 
 }
@@ -332,8 +369,10 @@ function mainAsync() {
   }
 
   (async () => {
-    // await test();
+
     rules = new rulesset.RulesControlerAsync(adapter);
+    set = new setenum.SetStatesAsync(adapter);
+    // await test();
     let cal = adapter.config.holiday || 'HH';
 
     //Get every Jear new Hollidays
@@ -367,7 +406,8 @@ function mainAsync() {
       adapter.log.info('Got coordinates!');
     }
 
-    let r = await loadRulesSetAsync();
+    let r = await loadRulesSetAdapterAsync(); // Test 
+    r = await loadRulesSetAsync();
     rules.addRules(r);
     // showRules();
     await executeRulesAsync(rules);
@@ -376,6 +416,9 @@ function mainAsync() {
         await executeRulesAsync(rules);
       })();
     }, adapter.config.pollInterval * 1000);
+
+    r = await loadExecuteSetAdapterAsync();
+    await set.addRules(r);
 
   })();
 
