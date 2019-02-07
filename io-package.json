@@ -51,6 +51,7 @@
     "pollInterval": "5",
     "simulation": false,
     "holiday": "HH",
+    "executeset": false,
     "ruleset": []
   },
   "objects": [],
