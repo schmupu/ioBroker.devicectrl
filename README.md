@@ -5,7 +5,7 @@
 
 [![Travis CI Build Status](https://travis-ci.org/schmupu/ioBroker.devicectrl.svg?branch=master)](https://travis-ci.org/schmupu/ioBroker.devicectrl)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/schmupu/ioBroker.devicectrl?branch=master&svg=true)](https://ci.appveyor.com/project/schmupu/ioBroker-devicectrl/)
-[![NPM version](http://img.shields.io/npm/v/iobroker.devicectrl.svg)](https://www.npmjs.com/package/iobroker.devicectrl)
+![Number of Installations](http://iobroker.live/badges/devicectrl-installed.svg) ![Number of Installations](http://iobroker.live/badges/devicectrl-stable.svg) [![NPM version](http://img.shields.io/npm/v/iobroker.devicectrl.svg)](https://www.npmjs.com/package/iobroker.devicectrl)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.devicectrl.svg)](https://www.npmjs.com/package/iobroker.devicectrl)
 
 [![NPM](https://nodei.co/npm/iobroker.devicectrl.png?downloads=true)](https://nodei.co/npm/iobroker.devicectrl/)
