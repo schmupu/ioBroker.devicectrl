@@ -39,60 +39,58 @@ function startAdapter(options) {
   // *****************************************************************************************************
   // Listen for sendTo messages
   // *****************************************************************************************************
-  adapter.on('message', (msg) => {
-    (async () => {
-      try {
-        let command = msg.command;
-        let parameter = msg.message;
-        let callback = msg.callback;
-        let r = undefined;
+  adapter.on('message', async (msg) => {
+    try {
+      let command = msg.command;
+      let parameter = msg.message;
+      let callback = msg.callback;
+      let r = undefined;
 
-        switch (command) {
-          case 'add':
-            if (parameter) {
-              adapter.log.info('Add Rule : ' + parameter.rulename);
-              await rules.addRule(parameter);
-            }
-            break;
-          case 'delete':
-            if (parameter) {
-              adapter.log.info('Delete Rule : ' + parameter);
-              await rules.deleteRule(parameter);
-            }
-            break;
-          case 'holiday':
-            rules.setHolidays(parameter);
-            await saveHolidaysAsync(parameter);
-            break;
-          case 'save':
-            r = rules.getRules();
-            await saveRulesSetAdpaterAsync(r); // Aus Adapter lesen (Test)
-            await saveRulesSetAsync(r);
-            break;
-          case 'load':
-            r = await loadRulesSetAdapterAsync();  // in  Adapter schreiben (Test)
-            r = await loadRulesSetAsync();
-            await rules.addRules(r);
-            break;
-          case 'addset':
-            await set.addRule(parameter);
-            break;
-          case 'saveset':
-            r = set.getRules();
-            await saveExecuteSetAdpaterAsync(r);
-            break;
-          case 'loadset':
-            r = await loadExecuteSetAdapterAsync();
-            await set.addRules(r);
-            break;
-          default:
-        }
-        await executeRulesAsync(rules);
-        adapter.sendTo(msg.from, msg.command, 'Execute command ' + command, callback);
-      } catch (error) {
-        adapter.log.error(error);
+      switch (command) {
+        case 'add':
+          if (parameter) {
+            adapter.log.info('Add Rule : ' + parameter.rulename);
+            await rules.addRule(parameter);
+          }
+          break;
+        case 'delete':
+          if (parameter) {
+            adapter.log.info('Delete Rule : ' + parameter);
+            await rules.deleteRule(parameter);
+          }
+          break;
+        case 'holiday':
+          rules.setHolidays(parameter);
+          await saveHolidaysAsync(parameter);
+          break;
+        case 'save':
+          r = rules.getRules();
+          await saveRulesSetAdpaterAsync(r); // Aus Adapter lesen (Test)
+          await saveRulesSetAsync(r);
+          break;
+        case 'load':
+          r = await loadRulesSetAdapterAsync();  // in  Adapter schreiben (Test)
+          r = await loadRulesSetAsync();
+          await rules.addRules(r);
+          break;
+        case 'addset':
+          await set.addRule(parameter);
+          break;
+        case 'saveset':
+          r = set.getRules();
+          await saveExecuteSetAdpaterAsync(r);
+          break;
+        case 'loadset':
+          r = await loadExecuteSetAdapterAsync();
+          await set.addRules(r);
+          break;
+        default:
       }
-    })();
+      await executeRulesAsync(rules);
+      adapter.sendTo(msg.from, msg.command, 'Execute command ' + command, callback);
+    } catch (error) {
+      adapter.log.error(error);
+    }
   });
 
   // *****************************************************************************************************
@@ -411,10 +409,8 @@ function mainAsync() {
     rules.addRules(r);
     // showRules();
     await executeRulesAsync(rules);
-    setInterval(() => {
-      (async () => {
-        await executeRulesAsync(rules);
-      })();
+    setInterval(async () => {
+      await executeRulesAsync(rules);
     }, adapter.config.pollInterval * 1000);
 
     r = await loadExecuteSetAdapterAsync();
