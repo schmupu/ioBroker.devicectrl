@@ -65,11 +65,11 @@ function startAdapter(options) {
           break;
         case 'save':
           r = rules.getRules();
-          await saveRulesSetAdpaterAsync(r); // Aus Adapter lesen (Test)
+          await saveRulesSetAdpaterAsync(r); // in  Adapter schreiben (Test)
           await saveRulesSetAsync(r);
           break;
         case 'load':
-          r = await loadRulesSetAdapterAsync();  // in  Adapter schreiben (Test)
+          r = await loadRulesSetAdapterAsync();  // Aus Adapter lesen (Test)
           r = await loadRulesSetAsync();
           await rules.addRules(r);
           break;

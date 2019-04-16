@@ -1,6 +1,6 @@
 ![Logo](admin/devicectrl.png)
 
-# ioBroker adapter to control devices
+# Controlling Devices with Rules
 
 
 [![Travis CI Build Status](https://travis-ci.org/schmupu/ioBroker.devicectrl.svg?branch=master)](https://travis-ci.org/schmupu/ioBroker.devicectrl)
@@ -10,14 +10,90 @@
 
 [![NPM](https://nodei.co/npm/iobroker.devicectrl.png?downloads=true)](https://nodei.co/npm/iobroker.devicectrl/)
 
-...
+You can control devices by a set of rules. For example you turn on a light, switch or change the temperature to a given time or on sunrise or sundown at your place. Also you can change the state of the devices depending of a state of other devices. For example, turn on a light, if the alarm system is arm between 6 am and 8 am and 8 pm and 10 pm.
 
 ## Install & Configuration
+In the moment you have to do the configuration by script. You have to do start the configuration script only if you add a new rule or change an existing rule.
 
-...
+The configuration ist not very complicated but not very user friendly in the moment. 
+
+
+For every rule you have to create an object like this.
+```
+let kitchenLight = {
+
+  rulename: "Kitchen Light", // name of rule
+  active: true,                 // rule acitve
+
+  time:   [ /* ... */ ],
+  state:  [ /* ... */ ],
+  rule:   [ /* ... */ ]
+
+}
+```
+For adding or changing rules you have do following: 
+```
+// add rule kitchenLight 
+sendTo("devicectrl.0", "add", kitchenLight, (result) => {
+  console.log(result);
+});
+
+// add rule livingRoomLight
+sendTo("devicectrl.0", "add", livingRoomLight, (result) => {
+  console.log(result);
+});
+
+// save rule kitchenLight and livingRoomLight to all existing rules. 
+// After saving, the adapter restarts and the rule is active.
+// In the ioBroker Logfile you see errors if one exist. 
+sendTo("devicectrl.0", "save", "", (result) => {
+  console.log(result);
+});
+```
+If you want to delete a rule you deactivate a rule by setting in the rule object the active flag to false or you delete the rule.
+For deleting a rule you to do following:
+```
+// Deleting rule you call delete by adding the rulename. 
+// Deleting rule "Kitchen Light"
+sendTo("devicectrl.0", "delete", "Kitchen Light", (result) => {
+  console.log("Delete: " + result);
+});
+
+// With Asterisk (*) you delete all rules
+sendTo("devicectrl.0", "delete", "*", (result) => {
+  console.log("Delete: " + result);
+});
+```
+
+### Explanation of the rule object
+Detailed explanation of the rule object.
+```
+let kitchenLight = {
+
+  rulename: "Kitchen Light", // name of rule
+  active: true,                 // rule acitve
+
+  time:   [ /* ... */ ],
+  state:  [ /* ... */ ],
+  rule:   [ /* ... */ ]
+
+}
+```
+
+**Rule name and Active flag**
+
+*rulename*: the name of rule (string).
+*active*: if rule shall be active or inactive (boolean) 
+For example:
+
+
+**Time**
+
+**State**
+
+**Rule**
 
 ## Changelog
-
 ### 0.1.4 (21.01.2019)
 * (Stübi) delete old functions
 
