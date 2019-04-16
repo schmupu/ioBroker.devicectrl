@@ -22,7 +22,7 @@ For every rule you have to create an object like this.
 ```
 let kitchenLight = {
 
-  rulename: "Kitchen Light", // name of rule
+  rulename: "Kitchen Light",    // name of rule
   active: true,                 // rule acitve
 
   time:   [ /* ... */ ],
@@ -70,7 +70,7 @@ Detailed explanation of the rule object.
 ```
 let kitchenLight = {
 
-  rulename: "Kitchen Light", // name of rule
+  rulename: "Kitchen Light",    // name of rule
   active: true,                 // rule acitve
 
   time:   [ /* ... */ ],
@@ -82,12 +82,85 @@ let kitchenLight = {
 
 **Rule name and Active flag**
 
-*rulename*: the name of rule (string).
-*active*: if rule shall be active or inactive (boolean) 
-For example:
+```
+let kitchenLight = {
+  rulename: "Kitchen Light",    // name of rule
+  active: true,                 // rule acitve
+  /* ... */
+}
+```
+*rulename*:   
+the name of rule (string).
 
+*active*:     
+if rule shall be active or inactive (boolean) 
 
 **Time**
+```
+let kitchenLight = {
+  /* ... */
+  time: [ 
+    { name: "t1", 
+      from: "06:30", 
+      to: "22:00", 
+      weekday: "So" 
+    }
+    { name: "t2", 
+      from: "06:00,06:30", 
+      rangefrom: "06:15,06:20", 
+      to: "23:00", 
+      weekday: "Fr"
+    },
+    { name: "t3", 
+      from: "06:30", 
+      to: "22:00", 
+      weekday: "So" 
+    }
+    { name: "t4", 
+      from: "sunreise-02:00,09:00",
+      to: "05:00,05:15",  
+      range: "06:00,09:00", 
+      weekday: "Mo,Di,Mi,Do,Fr", 
+    },
+  ],
+  /* ... */
+}
+```
+The property time of a rule is an array of objects. Every object of this array can have following properties:
+
+
+*name*:  
+Name of this time object
+
+*from*:  
+The property from can have following format
+* "HH:MM":  valid from HH:MM. For example "14:00"
+* "HH:MM,hh:mm": A random time between "HH:MM" and "hh:mm". For example, if you enter "14:00,15:00", from will be "14:34" or "14:59"
+* "sunrise" or "sunset": placeholder for the sunrise or sunset time at your place.
+* "sunrise,12:00": A random time between sunrise and 12:00 at your place. For example, the sunrise is at 6:15, you get back an random time between 6:15 and 12:00 like 10:13.
+* "19:00,sunset": A random time between 19:00 and sunset at your place. For example, the sunset is at 19:15, you get back an random time between 19:00 and 19:15 like 19:13.
+* "sunset-02:00,sunset+02:00": A random time between sunset minus 2 hours and sunset plus 2 hours at your place. For example, the sunset is at 19:15, you get back an random time between 17:15 and 21:15 like 20:13.
+
+*to*:  
+The property to can have following format
+* "HH:MM":  valid till HH:MM. For example "14:00"
+* "HH:MM,hh:mm": A random time between "HH:MM" and "hh:mm". For example, if you enter "14:00,15:00", from will be "14:34" or "14:59"
+* "sunrise" or "sunset": placeholder for the sunrise or sunset time at your place.
+* "sunrise,12:00": A random time between sunrise and 12:00 at your place. For example, the sunrise is at 6:15, you get back an random time between 6:15 and 12:00 like 10:13.
+* "19:00,sunset": A random time between 19:00 and sunset at your place. For example, the sunset is at 19:15, you get back an random time between 19:00 and 19:15 like 19:13.
+* "sunset-02:00,sunset+02:00": A random time between sunset minus 2 hours and sunset plus 2 hours at your place. For example, the sunset is at 19:15, you get back an random time between 17:15 and 21:15 like 20:13.
+
+*range*:  
+* "HH:MM,hh:mm": The object is only valid if the time in to and from is between the range "HH:MM" and "hh:mm". For example you would like to turn on the light outside your house always between sunrise and 9:00 but never before 6:00 you can add an range like this "06:00,09:00", from "sunrise" and to "09:00". Instead of "HH:MM" or "hh:mm" you can use "sunrise" or "sunset")
+
+*duration*:  
+You can use duration with the property *from* or *to*. If *from* is "HH:MM" and duration is "hh:mm" or "-hh:mm" than the time will go from  "HH:MM" to "HH:MM" + "hh:mm" or "HH:MM" + "-hh:mm". For example: *from* is "15:00" and duration is "03:00" than it will go from 15:00 to 18:00. 
+
+*weekday* (optional):  
+You can enter a weekday the object is valid. Weekday can be Sa,So,Mo,Di,Mi,Do,Fr. If you leave it empty, every weekday is valid. You can enter numerous weekday with comma separated. 
+Example: "Mo" or "Mo,Di" or "Mo,Sa,So"
+Holidays will be equalized with Sunday. For example, today is Wednesday and New Year, than the object is only valid if weekday comprise Sunday.
+
 
 **State**
 
