@@ -165,6 +165,21 @@ Holidays will be equalized with Sunday. For example, today is Wednesday and New 
 **State**
 
 **Rule**
+```
+let kitchenLight = {
+  /* ... */
+   rule: [
+        { name: "r0", query: "t0.v", id: idLEDKetteWeiss, delay: '00:01:00,00:02:30', value: true },
+        { name: "r1", query: "t0.v && l.v <= 180 && e.v == false", id: idLEDKetteWeiss, value: true },
+        { name: "r2", query: "t0.v && l.v >= 9 && e.v == true", id: idLEDKetteWeiss, value: false },
+        { name: "r3", query: "!t0.v", id: idLEDKetteWeiss, value: false }
+    ]
+  /* ... */
+}
+```
+
+*delay*  
+The time before changing the state of a rule. Delay can be specified in following format: "HH:MM:SS" (fixed delay time) or "HH:MM:SS,hh:mm:ss" (random delay time between HH:MM:SS and hh:mm:ss)   
 
 ## Changelog
 ### 0.1.4 (21.01.2019)
