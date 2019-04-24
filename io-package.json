@@ -1,9 +1,13 @@
 {
   "common": {
     "name": "devicectrl",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "title": "Device Controler",
     "news": {
+      "0.1.5": {
+        "en": "Bugfixing and redesign ",
+        "de": "Fehlerbehebung und Redesign "
+      },
       "0.1.4": {
         "en": "Delete old functions",
         "de": "Löschen alter Funktionen"

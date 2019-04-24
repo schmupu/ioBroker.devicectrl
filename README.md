@@ -182,6 +182,10 @@ let kitchenLight = {
 The time before changing the state of a rule. Delay can be specified in following format: "HH:MM:SS" (fixed delay time) or "HH:MM:SS,hh:mm:ss" (random delay time between HH:MM:SS and hh:mm:ss)   
 
 ## Changelog
+
+### 0.1.5 (01.05.2019)
+* (Stübi) Bugfixing and redesign 
+
 ### 0.1.4 (21.01.2019)
 * (Stübi) delete old functions
 

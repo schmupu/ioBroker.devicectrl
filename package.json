@@ -1,6 +1,6 @@
 {
   "name": "iobroker.devicectrl",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Device Controler",
   "author": {
     "name": "Thorsten Stueben",
