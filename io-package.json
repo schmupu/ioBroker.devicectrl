@@ -1,9 +1,13 @@
 {
   "common": {
     "name": "devicectrl",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "title": "Device Controler",
     "news": {
+      "0.1.6": {
+        "en": "Add event handler",
+        "de": "Horcht auf Events"
+      },
       "0.1.5": {
         "en": "Bugfixing and redesign ",
         "de": "Fehlerbehebung und Redesign "

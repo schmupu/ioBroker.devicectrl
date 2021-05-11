@@ -183,6 +183,10 @@ The time before changing the state of a rule. Delay can be specified in followin
 
 ## Changelog
 
+### 0.1.6 (17.12.2019)
+* (Stübi) Add event listener // beta
+* (Stübi) Admin5 and js-controller 
+
 ### 0.1.5 (01.05.2019)
 * (Stübi) Bugfixing and redesign 
 

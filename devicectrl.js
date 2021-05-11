@@ -147,7 +147,7 @@ async function saveHolidaysAsync(holiday) {
     try {
       let id = 'config.holiday';
       holiday = JSON.stringify(holiday);
-      await adapter.setStateAsync(id, holiday, true);
+      await adapter.setStateAsync(id, { val: holiday, ack: true });
       adapter.log.info('Saving Holidays');
     } catch (error) {
       adapter.log.info('Error, saving Holidays');
@@ -182,7 +182,7 @@ async function saveExecuteSetAdpaterAsync(ruleset) {
       let id = 'config.executeset';
       ruleset = JSON.stringify(ruleset);
       adapter.log.info('Saving Execute Ruleset (Adapter)');
-      await adapter.setStateAsync(id, ruleset, true);
+      await adapter.setStateAsync(id, { val: ruleset, ack: true });
       adapter.log.info('Saving Execute Ruleset successfull');
     } catch (error) {
       adapter.log.info('Nothing to save');
@@ -199,7 +199,7 @@ async function saveRulesSetAdpaterAsync(ruleset) {
       let id = 'config.ruleset';
       ruleset = JSON.stringify(ruleset);
       adapter.log.info('Saving Ruleset (Adapter)');
-      await adapter.setStateAsync(id, ruleset, true);
+      await adapter.setStateAsync(id, { val: ruleset, ack: true });
       adapter.log.info('Saving Ruleset successfull');
     } catch (error) {
       adapter.log.info('Nothing to save');
@@ -299,7 +299,7 @@ function executeRulesAsync(rules) {
   (async () => {
     try {
       let simulation = adapter.config.simulation || false;
-      let values = await rules.executeRulesAsync();
+      let values = await rules.executeAllRulesAsync();
 
       if (values) {
         adapter.log.debug(JSON.stringify(values));
@@ -408,6 +408,7 @@ function mainAsync() {
     r = await loadRulesSetAsync();
     rules.addRules(r);
     // showRules();
+    // adapter.config.pollInterval = 60; // 1 mal die Minute um zeitabhängige Dinge zu setzen
     await executeRulesAsync(rules);
     setInterval(async () => {
       await executeRulesAsync(rules);
