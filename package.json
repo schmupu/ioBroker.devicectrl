@@ -1,6 +1,6 @@
 {
   "name": "iobroker.devicectrl",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Device Controler",
   "author": {
     "name": "Thorsten Stueben",
@@ -23,18 +23,18 @@
     "url": "https://github.com/schmupu/ioBroker.devicectrl"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^2.4.0",
+    "@iobroker/adapter-core": "^2.5.1",
     "node-schedule": "^2.0.0",
     "request": "^2.88.2",
     "semver": "^7.3.5",
     "suncalc": "^1.8.0"
   },
   "devDependencies": {
-    "@iobroker/testing": "^2.4.4",
     "@alcalzone/release-script": "^1.10.0",
+    "@iobroker/testing": "^2.4.4",
     "chai": "^4.3.4",
-    "eslint": "^7.26.0",
-    "eslint-plugin-react": "^7.23.2",
+    "eslint": "^7.32.0",
+    "eslint-plugin-react": "^7.24.0",
     "gulp": "^4.0.2",
     "mocha": "^8.4.0"
   },

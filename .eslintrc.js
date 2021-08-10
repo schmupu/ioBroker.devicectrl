@@ -34,6 +34,7 @@ module.exports = {
         ],
         'generator-star-spacing': 'off',
         'func-names': ['error', 'never'],
-        'quotes': ['error', 'single']
+        'quotes': ['error', 'single'],
+        'no-useless-catch': 'off',
     }
 }
